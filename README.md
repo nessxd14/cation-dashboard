@@ -27,7 +27,10 @@ En Vercel: mismas dos variables de entorno, sin pasos extra.
 | `/salud` Salud de datos | Listo (Fase 1) |
 | `/ventas`, `/almacen` | Listo (Fase 2, migración `2026-10-12b_dash_ventas_almacen.sql`) |
 | `/finanzas` | Listo (Fase 3, migración `2026-10-13_dash_finanzas.sql`) |
+| `/pedidos` | Consolidado WholeSale: expediente, evidencias y contexto para OpenClaw |
 | `/detalle`, `/inventario`, `/margen`, `/metas`, `/cobranza` | Listo (Dashboard operativo) |
 | `/auditoria` La Chismosa | Cuando La Chismosa suba al repo |
 
 El efecto vidrio se apaga solo en equipos que no lo soportan o con "reducir transparencia"; también hay un botón "Modo liviano" en el menú.
+
+El contrato de WholeSale, las lecturas de OpenClaw y el registro de clips están en [docs/wholesale-openclaw.md](docs/wholesale-openclaw.md).

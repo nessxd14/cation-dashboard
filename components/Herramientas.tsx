@@ -76,40 +76,44 @@ export function Herramientas({
           <option value={300}>Cada 5 minutos</option>
         </select>
       </label>
-      <label>
-        Reporte{" "}
-        <select
-          aria-label="Datos a exportar"
-          value={tipos.includes(tipo) ? tipo : tipos[0]}
-          onChange={(e) => setTipo(e.target.value)}
-        >
-          {tipos.map((t) => (
-            <option key={t} value={t}>
-              {
-                (
+      {tipos.length > 0 ? (
+        <>
+          <label>
+            Reporte{" "}
+            <select
+              aria-label="Datos a exportar"
+              value={tipos.includes(tipo) ? tipo : tipos[0]}
+              onChange={(e) => setTipo(e.target.value)}
+            >
+              {tipos.map((t) => (
+                <option key={t} value={t}>
                   {
-                    ventas: "Ventas",
-                    cobros: "Cobros",
-                    salidas: "Salidas",
-                    cartera: "Partidas por cobrar",
-                    inventario: "Inventario",
-                    margen: "Márgenes",
-                    cobranza: "Prioridades de cobranza",
-                    metas: "Metas",
-                    alertas: "Detalle de alerta",
-                  } as Record<string, string>
-                )[t]
-              }
-            </option>
-          ))}
-        </select>
-      </label>
-      <a href={exportUrl("xlsx")} className="boton-vidrio">
-        Excel
-      </a>
-      <a href={exportUrl("pdf")} className="boton-vidrio">
-        PDF
-      </a>
+                    (
+                      {
+                        ventas: "Ventas",
+                        cobros: "Cobros",
+                        salidas: "Salidas",
+                        cartera: "Partidas por cobrar",
+                        inventario: "Inventario",
+                        margen: "Márgenes",
+                        cobranza: "Prioridades de cobranza",
+                        metas: "Metas",
+                        alertas: "Detalle de alerta",
+                      } as Record<string, string>
+                    )[t]
+                  }
+                </option>
+              ))}
+            </select>
+          </label>
+          <a href={exportUrl("xlsx")} className="boton-vidrio">
+            Excel
+          </a>
+          <a href={exportUrl("pdf")} className="boton-vidrio">
+            PDF
+          </a>
+        </>
+      ) : null}
       <span role="status" className="visually-hidden">
         {pendiente ? `Actualizando ${ruta}` : "Datos consultados"}
       </span>

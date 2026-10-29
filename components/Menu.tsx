@@ -17,6 +17,7 @@ type Props = {
 const PANTALLAS = [
   { href: "/", texto: "Resumen" },
   { href: "/ventas", texto: "Ventas" },
+  { href: "/pedidos", texto: "Pedidos", extra: "WholeSale" },
   { href: "/almacen", texto: "Almacén" },
   { href: "/finanzas", texto: "Finanzas" },
   { href: "/inventario", texto: "Inventario" },
