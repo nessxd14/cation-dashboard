@@ -64,3 +64,13 @@ Seller y Almacén tienen los dominios confirmados como valores por defecto. Sell
 - Next.js actualizado al parche 15.5.28; overrides de PostCSS y uuid verificados con auditoría de dependencias.
 
 El código está vinculado al repositorio `nessxd14/cation-dashboard`. Las migraciones de Supabase están aplicadas. El despliegue Vercel de la aplicación se configura mediante el flujo habitual del repositorio.
+
+## Consulta de Resumen y recuperación de errores
+
+El 29 de octubre se corrigió un timeout en `/`: la función repetía las mismas lecturas por cada indicador y excedía el límite de 8 segundos de la sesión autenticada. Las migraciones `20261029140058_dashboard_resumen_consulta_unica.sql` y `20261029140719_dashboard_resumen_hechos_compartidos.sql` comparten los hechos de ventas y los conjuntos filtrados dentro de una sola consulta. No cambian tablas operativas, permisos ni el timeout de los roles.
+
+Se mantiene el historial completo de ventas para seleccionar pedidos abiertos, el período actual/anterior para cobros y la selección sin sucursal que requieren los filtros de movimientos. Se excluyen las mismas salidas revertidas o de pedidos cancelados. Se ordenan explícitamente los egresos por tipo para estabilizar su presentación.
+
+La comparación en una transacción con aislamiento repetible produjo el mismo JSON que la implementación anterior, normalizando únicamente el orden no definido de egresos. Casos comprobados: general, canal institucional y cliente. Mediciones observadas: general 11.831 ms antes y 793 ms después; institucional 4.696/325 ms; cliente 3.106/385 ms. Con rol `authenticated` y límite de 8 segundos, la consulta completa terminó en 416 ms. Son mediciones de esta base, no una garantía de tiempo bajo cualquier carga.
+
+Los errores de timeout conocidos se convierten en un aviso recuperable antes de serializar Server Components. Los errores inesperados muestran un mensaje seguro y la referencia de soporte, evitando presentar al usuario el texto técnico de Next.js. `tests/resumen.test.cjs` reproduce el timeout y comprueba el manejo seguro del error.

@@ -14,13 +14,22 @@ import type { Filtros } from "./filtros";
 export class ErrorDatos extends Error {
   constructor(
     message: string,
-    public tipo: "sin_acceso" | "sin_migracion" | "otro",
+    public tipo: "sin_acceso" | "sin_migracion" | "tiempo_agotado" | "otro",
   ) {
     super(message);
   }
 }
 
-function traducir(error: { code?: string; message: string }): ErrorDatos {
+export function traducirErrorDatos(error: {
+  code?: string;
+  message: string;
+}): ErrorDatos {
+  if (error.code === "57014" || /statement timeout/i.test(error.message)) {
+    return new ErrorDatos(
+      "La consulta tardó más de lo permitido. Vuelve a intentarlo o selecciona un período más corto.",
+      "tiempo_agotado",
+    );
+  }
   if (error.code === "42501") {
     return new ErrorDatos(
       "Tu cuenta no tiene acceso al dashboard.",
@@ -37,14 +46,18 @@ function traducir(error: { code?: string; message: string }): ErrorDatos {
       "sin_migracion",
     );
   }
-  return new ErrorDatos(error.message, "otro");
+  console.error("Dashboard: error de consulta", error.code, error.message);
+  return new ErrorDatos(
+    "No se pudo completar la consulta. Inténtalo de nuevo.",
+    "otro",
+  );
 }
 
 /** ¿El usuario actual puede ver el dashboard? (Ness y el gerente). */
 export const tieneAcceso = cache(async (): Promise<boolean> => {
   const supabase = await crearClienteServidor();
   const { data, error } = await supabase.rpc("dash_acceso");
-  if (error) throw traducir(error);
+  if (error) throw traducirErrorDatos(error);
   return data === true;
 });
 
@@ -67,7 +80,7 @@ export async function obtenerResumen(
     p_hasta: hasta,
     p_filtros: filtros,
   });
-  if (error) throw traducir(error);
+  if (error) throw traducirErrorDatos(error);
   return data as Resumen;
 }
 
@@ -82,7 +95,7 @@ export async function obtenerVentas(
     p_hasta: hasta,
     p_filtros: filtros,
   });
-  if (error) throw traducir(error);
+  if (error) throw traducirErrorDatos(error);
   return data as Ventas;
 }
 
@@ -97,7 +110,7 @@ export async function obtenerAlmacen(
     p_hasta: hasta,
     p_filtros: filtros,
   });
-  if (error) throw traducir(error);
+  if (error) throw traducirErrorDatos(error);
   return data as Almacen;
 }
 
@@ -112,13 +125,13 @@ export async function obtenerFinanzas(
     p_hasta: hasta,
     p_filtros: filtros,
   });
-  if (error) throw traducir(error);
+  if (error) throw traducirErrorDatos(error);
   return data as Finanzas;
 }
 
 export const obtenerSalud = cache(async (): Promise<IndicadorSalud[]> => {
   const supabase = await crearClienteServidor();
   const { data, error } = await supabase.rpc("dash_salud");
-  if (error) throw traducir(error);
+  if (error) throw traducirErrorDatos(error);
   return (data ?? []) as IndicadorSalud[];
 });

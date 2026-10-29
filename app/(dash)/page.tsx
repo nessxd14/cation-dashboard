@@ -8,7 +8,8 @@ import {
 import { Kpi, ListaBarras, Panel } from "@/components/piezas";
 import { ListaSalud } from "@/components/ListaSalud";
 import { Chismosa } from "@/components/Chismosa";
-import { obtenerResumen, obtenerSalud } from "@/lib/datos";
+import { ErrorDatos, obtenerResumen, obtenerSalud } from "@/lib/datos";
+import { ErrorConsulta } from "@/components/ErrorConsulta";
 import {
   bs,
   bsConSigno,
@@ -25,6 +26,22 @@ import { Herramientas } from "@/components/Herramientas";
 const RETAIL = new Set(["MOSTRADOR", "VTD"]);
 
 export default async function ResumenPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  try {
+    return await ContenidoResumen({ searchParams });
+  } catch (error) {
+    // Los errores conocidos se convierten en contenido antes de que Next oculte
+    // las excepciones de Server Components en los builds de producción.
+    if (error instanceof ErrorDatos)
+      return <ErrorConsulta mensaje={error.message} />;
+    throw error;
+  }
+}
+
+async function ContenidoResumen({
   searchParams,
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
