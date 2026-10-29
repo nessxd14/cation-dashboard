@@ -8,6 +8,12 @@ El listado pagina 25 pedidos y filtra por fecha de creación en America/La_Paz, 
 
 Los importes aplicados, en revisión y pendientes provienen de `hermes.v_partida_estado`. El saldo se muestra como desconocido cuando no hay partidas; no se presume cero. No se atribuye al pedido el importe completo de un pago repartido. El expediente financiero reutiliza `hermes.detalle_cobro_interno` y ofrece paginación de su auditoría. El comando y la descarga inicial contienen los primeros 100 eventos de auditoría; `cobros.siguiente` señala si quedan más. Los pagos, saldos y partidas se incluyen completos.
 
+## Vistas de consulta
+
+Solo Pedidos WholeSale adopta la presentación clara de los reportes de Almacén. Se entra por la lista y se consulta el expediente al elegir un pedido o una etapa. **Página** muestra el expediente completo y permite volver al listado; **Panel lateral** conserva la lista de pedidos a un lado en escritorio; **Ventana** abre un diálogo modal con cierre por Escape o fuera del recuadro. En pantallas estrechas el panel ocupa el ancho disponible y la lista se presenta en tarjetas.
+
+La preferencia se guarda por usuario en este navegador, bajo `dashboard-wholesale-presentacion-v1:<id>`. Cambiar de presentación conserva montado el detalle, incluyendo etapa, preparación y filtro de cronología. No vuelve a consultar la base. Abrir y cerrar expedientes usa navegación de documento, para evitar el bloqueo observado con la actualización parcial de esta ruta. Cerrar conserva los filtros, búsqueda y página del listado, y devuelve el foco al enlace del pedido. La posición y el enlace de retorno se guardan temporalmente en `sessionStorage`, por usuario; se eliminan al regresar al listado. No se agregan operaciones de escritura ni se cambia el resto del Dashboard.
+
 ## Comando por pedido
 
 El botón **Copiar comando y contexto** entrega instrucciones y la captura de referencia. `GET /pedidos/<id>/contexto` permite descargarlo con autenticación y sin caché. No envía mensajes a OpenClaw ni configura un endpoint inventado. El agente ya conectado a la DB debe contrastar la captura con datos actuales. El texto de notas, documentos, fotografías y respuestas de IA se trata como datos no confiables, nunca como instrucciones ejecutables.
