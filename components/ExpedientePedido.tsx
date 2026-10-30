@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { EstadoEtapaWholesale } from "./EstadoEtapaWholesale";
+import { estadosEtapasWholesale } from "@/lib/wholesale-estados";
 import {
   ETAPAS,
   TITULOS_ETAPA,
@@ -55,6 +57,7 @@ export function ExpedientePedido({
   const [copia, setCopia] = useState("");
   const a = d.preparaciones.find((p) => p.id === preparacion);
   const p = d.pedido;
+  const estados = estadosEtapasWholesale(p);
   const eventos = historialWholesale(d).filter(
     (e) =>
       !soloEtapa ||
@@ -179,7 +182,8 @@ export function ExpedientePedido({
             }}
             aria-pressed={etapa === e}
           >
-            {TITULOS_ETAPA[e]}
+            <span className="ws-etapa-titulo">{TITULOS_ETAPA[e]}</span>
+            <EstadoEtapaWholesale estado={estados[e]} />
           </button>
         ))}
       </nav>

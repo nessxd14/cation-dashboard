@@ -259,7 +259,7 @@ export function VisorDetalle({
         ) : null}
         <dialog
           ref={dialog}
-          className={`vd-detalle vd-detalle-${modo}`}
+          className={`vidrio vd-detalle vd-detalle-${modo}`}
           role={modo === "ventana" ? "dialog" : "region"}
           aria-label={titulo}
           aria-modal={modo === "ventana" && abierto ? true : undefined}

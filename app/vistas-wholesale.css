@@ -1,232 +1,59 @@
-/* Las vistas de Reportes de Almacén se aplican únicamente a WholeSale. */
+/* WholeSale comparte los tokens, paneles de vidrio y controles del Dashboard. */
 .wholesale-reportes {
-  --fondo: #f3f6fb;
-  --texto: #24364a;
-  --texto-2: #586d83;
-  --texto-3: #62748a;
-  --linea: #e0e7ef;
-  --linea-fuerte: #cdd8e5;
-  --vidrio: #fff;
-  --vidrio-fuerte: #fff;
-  --vidrio-borde: #d8e2ec;
-  --vidrio-brillo: none;
-  --vidrio-sombra: none;
-  --blur: none;
-  --pedidos: #175c9d;
-  --cobrado: #217250;
-  --cartera: #7044a5;
-  --aviso: #936124;
-  --aviso-texto: #8b5b13;
-  --critico: #a63849;
-  --critico-texto: #a63849;
-  --vd-superficie: #fff;
-  --vd-suave: #f4f7fb;
-  --vd-acento: #175c9d;
-  --vd-seleccion: #e7f1fc;
-  color-scheme: light;
-  color: var(--texto);
-  background: var(--fondo);
-  padding: 24px;
-  border: 1px solid var(--vidrio-borde);
-  border-radius: 16px;
+  --vd-superficie: #121a2c;
+  --vd-suave: rgba(255, 255, 255, 0.045);
+  --vd-acento: var(--pedidos);
+  --vd-seleccion: rgba(110, 168, 254, 0.16);
   display: flex;
   flex-direction: column;
   gap: 18px;
   min-width: 0;
   max-width: 100%;
 }
-.wholesale-reportes .vidrio,
-.liviano .wholesale-reportes .vidrio {
-  background: #fff;
-  border: 1px solid #d8e2ec;
-  box-shadow: none;
-  backdrop-filter: none;
-  border-radius: 12px;
-}
-.wholesale-reportes .encabezado {
-  padding: 0;
-  align-items: flex-start;
-}
-.wholesale-reportes .encabezado h1 {
-  font-size: 25px;
-  font-weight: 650;
-  letter-spacing: -0.025em;
-}
-.wholesale-reportes .subtitulo {
-  font-size: 13px;
-  line-height: 1.6;
-}
-.wholesale-reportes a {
-  color: #175c9d;
-}
-.wholesale-reportes a:hover {
-  color: #124a80;
-}
-.wholesale-reportes button,
-.wholesale-reportes input,
-.wholesale-reportes select {
-  font: inherit;
-}
-.wholesale-reportes .boton-vidrio,
-.wholesale-reportes .rango button {
-  background: #fff;
-  border: 1px solid #cdd8e5;
-  border-radius: 7px;
-  color: #35506e;
-  box-shadow: none;
-  font-size: 13px;
-  font-weight: 550;
-  min-height: 42px;
-}
-.wholesale-reportes .boton-vidrio:hover:not(:disabled) {
-  background: #f0f5fb;
-}
-.wholesale-reportes button:disabled {
-  opacity: 0.55;
-  cursor: default;
-}
 .wholesale-reportes :focus-visible {
-  outline: 3px solid #6eafe7;
+  outline: 3px solid var(--pedidos);
   outline-offset: 3px;
 }
-.wholesale-reportes select,
-.wholesale-reportes input,
 .wholesale-reportes .ws-selector select,
 .wholesale-reportes .ws-buscar input {
-  background: #fff;
-  color: #24364a;
-  border: 1px solid #ced8e4;
-  border-radius: 7px;
-  min-width: 0;
+  background: var(--vd-superficie);
+  color: var(--texto);
+  border-color: var(--linea-fuerte);
   max-width: 100%;
-}
-.wholesale-reportes .periodos {
-  border-radius: 9px !important;
-}
-.wholesale-reportes .periodos a {
-  color: #35506e;
-  border-radius: 7px;
-}
-.wholesale-reportes .periodos a[aria-current="true"] {
-  background: #e7f1fc;
-  border-color: #a5c9ed;
-  box-shadow: none;
-  color: #15568f;
-}
-.wholesale-reportes .rango button {
-  background: #175c9d;
-  border-color: #175c9d;
-  color: #fff;
-}
-.wholesale-reportes .filtros-desplegables > summary {
-  color: #175c9d;
-}
-.wholesale-reportes .filtros {
-  border-radius: 9px;
-}
-.wholesale-reportes .herramientas {
-  padding: 12px 0;
-  border-block: 1px solid #d9e2ed;
-}
-.wholesale-reportes .panel {
-  padding: 19px;
-  gap: 14px;
-}
-.wholesale-reportes .panel h2 {
-  font-size: 17px;
-  font-weight: 650;
-}
-.wholesale-reportes .panel-sub {
-  color: #65748a;
-  font-size: 12px;
-  line-height: 1.6;
-}
-.wholesale-reportes table {
-  border-collapse: collapse;
-  font-size: 13px;
-}
-.wholesale-reportes th {
-  background: #f4f7fb;
-  font-size: 12px;
-  font-weight: 600;
-  color: #5c7189;
-  padding: 12px;
-  border-bottom: 1px solid #d8e2ec;
-}
-.wholesale-reportes td {
-  padding: 13px 12px;
-  border-bottom: 1px solid #e0e7ef;
-  vertical-align: top;
-}
-.wholesale-reportes .fila-sub {
-  color: #62748a;
-  line-height: 1.55;
-  font-size: 11px;
-}
-.wholesale-reportes .ws-seleccionado {
-  background: #edf5fe;
-}
-.wholesale-reportes .ws-insignia {
-  background: #eaf2fc;
-  color: #205f99;
-  border: 0;
-  border-radius: 5px;
-}
-.wholesale-reportes .ws-aviso {
-  color: #8b5b13 !important;
-}
-.wholesale-reportes .ws-vacio,
-.wholesale-reportes .ws-archivo-ausente {
-  background: #f4f7fb;
-  color: #62748a;
-}
-.wholesale-reportes .ws-registro,
-.wholesale-reportes .ws-datos,
-.wholesale-reportes .ws-evidencia {
-  border-color: #e0e7ef;
-}
-.wholesale-reportes .ws-camara {
-  background: #edf8f1;
-  border-color: #217250;
-}
-.wholesale-reportes .ws-openclaw {
-  background: #f5f1fa;
-  border-color: #e1d8ef;
-}
-.wholesale-reportes .ws-openclaw pre {
-  background: #fff;
-}
-.wholesale-reportes .ws-etapas {
-  background: #f4f7fb;
-  border-color: #d8e2ec;
-}
-.wholesale-reportes .ws-etapas button {
-  color: #35506e;
-  border-color: #cdd8e5;
-  background: #fff;
-  border-radius: 7px;
-}
-.wholesale-reportes .ws-etapas button[aria-pressed="true"] {
-  background: #e7f1fc;
-  border-color: #75a9d9;
-  color: #15568f;
-}
-.wholesale-reportes .ws-fotos img {
-  background: #edf2f8;
-}
-.wholesale-reportes .ws-pie,
-.wholesale-reportes .ws-historial {
-  border-color: #d8e2ec;
-}
-.wholesale-reportes .ws-historial li {
-  border-left-color: #d8e2ec;
-}
-.wholesale-reportes .ws-secuencia-filtro input {
-  min-height: 0;
-  width: auto;
 }
 .wholesale-reportes .ws-buscar {
   margin-bottom: 0;
+}
+.wholesale-reportes th {
+  background: var(--vd-suave);
+  padding: 12px;
+  font-weight: 600;
+}
+.wholesale-reportes td {
+  padding: 14px 12px;
+  vertical-align: top;
+}
+.wholesale-reportes .fila-sub {
+  line-height: 1.6;
+  font-size: 11px;
+}
+.wholesale-reportes .ws-tabla {
+  --texto-3: rgba(243, 245, 250, 0.8);
+}
+.wholesale-reportes .ws-tabla td:first-child > .fila-sub:first-of-type {
+  color: var(--texto);
+  font-weight: 550;
+}
+.wholesale-reportes .ws-tabla tbody tr:hover {
+  background: rgba(110, 168, 254, 0.045);
+}
+.wholesale-reportes .ws-tabla tbody tr.ws-seleccionado {
+  background: var(--vd-seleccion);
+}
+.wholesale-reportes .ws-insignia {
+  background: rgba(110, 168, 254, 0.12);
+  color: var(--pedidos);
+  border-color: rgba(110, 168, 254, 0.24);
 }
 .wholesale-reportes .ws-expediente {
   padding: 0;
@@ -234,6 +61,122 @@
 }
 .wholesale-reportes .ws-prewrap {
   line-height: 1.65;
+}
+/* Texto e iconos mantienen el significado de cada estado sin depender del color. */
+.wholesale-reportes .ws-estado-verde {
+  --ws-estado-texto: var(--cobrado);
+  --ws-estado-fondo: rgba(91, 214, 160, 0.12);
+  --ws-estado-borde: rgba(91, 214, 160, 0.24);
+}
+.wholesale-reportes .ws-estado-azul {
+  --ws-estado-texto: #a6caff;
+  --ws-estado-fondo: rgba(110, 168, 254, 0.14);
+  --ws-estado-borde: rgba(110, 168, 254, 0.26);
+}
+.wholesale-reportes .ws-estado-ambar {
+  --ws-estado-texto: var(--aviso-texto);
+  --ws-estado-fondo: rgba(255, 200, 87, 0.12);
+  --ws-estado-borde: rgba(255, 200, 87, 0.24);
+}
+.wholesale-reportes .ws-estado-rojo {
+  --ws-estado-texto: var(--critico-texto);
+  --ws-estado-fondo: rgba(255, 122, 107, 0.12);
+  --ws-estado-borde: rgba(255, 122, 107, 0.24);
+}
+.wholesale-reportes .ws-estado-gris {
+  --ws-estado-texto: var(--texto-2);
+  --ws-estado-fondo: rgba(255, 255, 255, 0.055);
+  --ws-estado-borde: var(--linea-fuerte);
+}
+.wholesale-reportes .ws-estado {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  padding: 6px 8px;
+  border-radius: 7px;
+  background: var(--ws-estado-fondo);
+  border: 1px solid var(--ws-estado-borde);
+  color: var(--ws-estado-texto);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.35;
+  text-align: left;
+}
+.ws-estado-icono {
+  flex: 0 0 15px;
+}
+.wholesale-reportes .ws-tabla .ws-enlace-etapa {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  max-width: 100%;
+  padding: 0;
+  border-radius: 7px;
+}
+.ws-enlace-etapa:hover .ws-estado {
+  box-shadow: inset 0 0 0 1px currentColor;
+}
+.wholesale-reportes .ws-tabla td {
+  min-width: 125px;
+}
+.wholesale-reportes .ws-tabla td:first-child {
+  min-width: 170px;
+}
+.ws-leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  padding: 12px 0;
+  border-block: 1px solid var(--linea);
+  color: var(--texto-2);
+  font-size: 11px;
+  line-height: 1.5;
+}
+.ws-leyenda > span {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+.ws-leyenda i {
+  display: inline-flex;
+  color: var(--ws-estado-texto);
+}
+.ws-leyenda p {
+  flex-basis: 100%;
+  margin: 0;
+}
+.wholesale-reportes .ws-etapas {
+  gap: 7px;
+}
+.wholesale-reportes .ws-etapas button {
+  display: flex;
+  flex: 1 1 120px;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px;
+  min-width: 0;
+  text-align: left;
+  transition:
+    border-color 120ms ease,
+    background-color 120ms ease;
+}
+.wholesale-reportes .ws-etapas button:hover {
+  border-color: var(--pedidos);
+}
+.wholesale-reportes .ws-etapas button[aria-pressed="true"] {
+  box-shadow: inset 0 0 0 1px var(--pedidos);
+}
+.ws-etapa-titulo {
+  font-size: 12px;
+  font-weight: 650;
+}
+@media (prefers-reduced-motion: reduce) {
+  .wholesale-reportes .ws-etapas button {
+    transition: none;
+  }
 }
 .vd-visor {
   container-type: inline-size;
@@ -270,9 +213,9 @@
   justify-content: center;
   gap: 7px;
   border: 1px solid var(--linea-fuerte);
-  background: var(--vd-superficie);
-  border-radius: 7px;
-  color: #35506e;
+  background: var(--vd-suave);
+  border-radius: 10px;
+  color: var(--texto-2);
   padding: 9px 11px;
   min-height: 42px;
   font-size: 12px;
@@ -284,9 +227,9 @@
 }
 .vd-selector button[aria-pressed="true"] {
   background: var(--vd-seleccion);
-  color: #15568f;
-  border-color: #75a9d9;
-  box-shadow: inset 0 0 0 1px #75a9d9;
+  color: var(--texto);
+  border-color: var(--pedidos);
+  box-shadow: inset 0 0 0 1px var(--pedidos);
 }
 .vd-ayuda {
   font-size: 12px;
@@ -303,17 +246,16 @@
   display: none;
 }
 .vd-cargando {
-  background: #edf4fc;
-  color: #355978;
+  background: var(--vd-seleccion);
+  color: var(--texto);
   padding: 10px 14px;
   border-radius: 7px;
   font-size: 12px;
 }
 .vd-detalle {
   color: var(--texto);
-  background: var(--vd-superficie);
   border: 1px solid var(--vidrio-borde);
-  border-radius: 12px;
+  border-radius: var(--radio);
   padding: 18px;
   min-width: 0;
   max-width: 100%;
@@ -345,10 +287,11 @@
   max-height: calc(100dvh - 40px);
   overflow: auto;
   overscroll-behavior: contain;
-  box-shadow: 0 24px 90px #102d4b40;
+  box-shadow: 0 24px 90px rgba(0, 0, 0, 0.6);
+  background: var(--vd-superficie);
 }
 .vd-detalle-ventana::backdrop {
-  background: #142b4699;
+  background: rgba(3, 7, 18, 0.72);
   backdrop-filter: blur(3px);
 }
 .vd-barra-detalle {
@@ -382,6 +325,10 @@
 .vd-cuerpo-detalle > .ws-expediente {
   border: 0 !important;
   border-radius: 0 !important;
+  background: transparent;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
 .vd-cuerpo-detalle > .ws-alcance {
   margin: 0 0 14px;
@@ -456,12 +403,7 @@
 }
 @media (max-width: 700px) {
   .wholesale-reportes {
-    padding: 15px;
-    border-radius: 12px;
     gap: 15px;
-  }
-  .wholesale-reportes .encabezado h1 {
-    font-size: 23px;
   }
   .wholesale-reportes .panel {
     padding: 14px;
@@ -523,12 +465,12 @@
     padding: 12px;
     border: 1px solid var(--linea-fuerte);
     border-radius: 9px;
-    background: #fff;
+    background: var(--vd-suave);
     gap: 9px 12px;
   }
   .vd-lista .ws-tabla tr.ws-seleccionado {
-    background: #edf5fe;
-    border-color: #75a9d9;
+    background: var(--vd-seleccion);
+    border-color: var(--pedidos);
   }
   .wholesale-reportes .vd-lista .ws-tabla td {
     border: 0;
@@ -599,9 +541,32 @@
     overflow: visible !important;
   }
   .wholesale-reportes {
-    padding: 0;
-    background: #fff;
-    border: 0;
+    --texto: #111;
+    --texto-2: #333;
+    --texto-3: #555;
+    --linea: #ddd;
+    --linea-fuerte: #bbb;
+    --pedidos: #175c9d;
+    --cobrado: #20603b;
+    --aviso-texto: #805700;
+    --critico-texto: #9e3c32;
+    --vd-superficie: #fff;
+    --vd-suave: transparent;
+    --vd-seleccion: transparent;
+    color: var(--texto);
+  }
+  .wholesale-reportes .ws-estado-azul {
+    --ws-estado-texto: #285d8b;
+  }
+  .wholesale-reportes .ws-tabla {
+    --texto-3: #444;
+  }
+  .wholesale-reportes .ws-estado {
+    background: transparent;
+    border-color: currentColor;
+  }
+  .wholesale-reportes .ws-tabla tr {
+    background: transparent !important;
   }
   .vd-detalle::backdrop {
     display: none;

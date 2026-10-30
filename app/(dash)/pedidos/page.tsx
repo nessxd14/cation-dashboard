@@ -14,14 +14,13 @@ import {
 } from "@/lib/wholesale-servidor";
 import {
   ETAPAS,
-  categoriaWholesale,
-  fechaWholesale,
-  dineroWholesale,
   idWholesale,
   enlaceWholesale,
   type Etapa,
 } from "@/lib/wholesale";
 import { enlaceOrigen } from "@/lib/enlaces";
+import { FilaPedidoWholesale } from "@/components/FilaPedidoWholesale";
+import { LeyendaEtapasWholesale } from "@/components/EstadoEtapaWholesale";
 
 export default async function PedidosPage({
   searchParams,
@@ -107,6 +106,7 @@ export default async function PedidosPage({
                 comercial.
               </p>
             ) : null}
+            <LeyendaEtapasWholesale />
             <div className="tabla-scroll">
               <table className="ws-tabla">
                 <thead>
@@ -117,112 +117,18 @@ export default async function PedidosPage({
                     <th>Alistado</th>
                     <th>Verificación</th>
                     <th>Salida</th>
-                    <th>Aplicado / saldo de partidas</th>
+                    <th>Pago / saldo</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {lista.filas.map((p) => {
-                    const link = (e: Etapa) =>
-                      enlaceWholesale(params, { pedido: p.id, etapa: e });
-                    return (
-                      <tr
-                        key={p.id}
-                        className={
-                          pedido === p.id ? "ws-seleccionado" : undefined
-                        }
-                      >
-                        <td>
-                          <a
-                            href={link("pedido")}
-                            data-abrir-detalle={p.id}
-                            aria-current={pedido === p.id ? "true" : undefined}
-                          >
-                            <strong>{p.numero}</strong>
-                          </a>
-                          <span className="fila-sub">{p.cliente}</span>
-                          <span className="fila-sub">
-                            {categoriaWholesale(p.categoria)} · {p.estado}
-                          </span>
-                        </td>
-                        <td data-etiqueta="Cotización">
-                          <a
-                            href={link("cotizacion")}
-                            data-abrir-detalle={p.id}
-                          >
-                            {p.cotizacion || "Sin vínculo"}
-                          </a>
-                          <span className="fila-sub">
-                            {p.cotizacion_en
-                              ? fechaWholesale(p.cotizacion_en)
-                              : "Sin registro"}
-                          </span>
-                        </td>
-                        <td data-etiqueta="Pedido">
-                          <a href={link("pedido")} data-abrir-detalle={p.id}>
-                            Registrado
-                          </a>
-                          <span className="fila-sub">
-                            {fechaWholesale(p.creado_en)}
-                          </span>
-                        </td>
-                        <td data-etiqueta="Alistado">
-                          <a href={link("alistado")} data-abrir-detalle={p.id}>
-                            {p.preparaciones
-                              ? `${p.preparaciones} preparaciones`
-                              : "Sin registro"}
-                          </a>
-                          <span className="fila-sub">
-                            {p.preparado_en
-                              ? `Última marca: ${fechaWholesale(p.preparado_en)}`
-                              : p.ultima_preparacion_estado ||
-                                "Sin marca de preparado"}
-                          </span>
-                        </td>
-                        <td data-etiqueta="Verificación">
-                          <a
-                            href={link("verificacion")}
-                            data-abrir-detalle={p.id}
-                          >
-                            {p.verificado_en ? "Con registro" : "Sin marca"}
-                          </a>
-                          <span className="fila-sub">
-                            {p.verificado_en
-                              ? `Última: ${fechaWholesale(p.verificado_en)}`
-                              : "Ver detalle de cada tanda"}
-                          </span>
-                        </td>
-                        <td data-etiqueta="Salida">
-                          <a href={link("salida")} data-abrir-detalle={p.id}>
-                            {p.salidas
-                              ? p.lineas_vigentes > 0 &&
-                                p.lineas_entregadas === p.lineas_vigentes
-                                ? "Completa"
-                                : "Parcial"
-                              : "Sin salidas vigentes"}
-                          </a>
-                          <span className="fila-sub">
-                            {p.salidas} movimientos
-                            {p.salida_en
-                              ? ` · ${fechaWholesale(p.salida_en)}`
-                              : ""}
-                          </span>
-                        </td>
-                        <td data-etiqueta="Pago / saldo">
-                          <a href={link("pago")} data-abrir-detalle={p.id}>
-                            {dineroWholesale(p.aplicado)} aplicado
-                          </a>
-                          <span className="fila-sub">
-                            Saldo: {dineroWholesale(p.saldo)}
-                          </span>
-                          {Number(p.en_revision) > 0 ? (
-                            <span className="ws-aviso">
-                              En revisión: {dineroWholesale(p.en_revision)}
-                            </span>
-                          ) : null}
-                        </td>
-                      </tr>
-                    );
-                  })}
+                  {lista.filas.map((p) => (
+                    <FilaPedidoWholesale
+                      key={p.id}
+                      pedido={p}
+                      params={params}
+                      seleccionado={pedido === p.id}
+                    />
+                  ))}
                   {!lista.filas.length ? (
                     <tr>
                       <td colSpan={7}>
