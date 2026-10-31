@@ -1,0 +1,351 @@
+.retail-reportes {
+  --rt-almacen: #78dce8;
+}
+.rt-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 20px 0;
+}
+.rt-tabs a {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 15px;
+  border: 1px solid var(--linea-fuerte);
+  border-radius: 12px;
+  color: var(--texto-2);
+  background: var(--vidrio);
+  text-decoration: none;
+}
+.rt-tabs a[aria-current="page"] {
+  color: var(--texto);
+  background: var(--vidrio-fuerte);
+  border-color: var(--pedidos);
+}
+.rt-tabs .mono {
+  color: var(--texto-3);
+  font-size: 12px;
+}
+.rt-kpis {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+.rt-kpis .kpi {
+  min-width: 0;
+}
+.rt-kpis .kpi-valor {
+  font-size: clamp(20px, 2.3vw, 32px);
+  overflow-wrap: anywhere;
+}
+.rt-cola {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px 22px;
+  margin: 16px 0 22px;
+  font-size: 12px;
+  color: var(--texto-2);
+}
+.rt-cola strong {
+  color: var(--texto);
+}
+.rt-lista,
+.rt-expediente {
+  padding: 22px;
+}
+.rt-seccion-cabeza {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+.rt-seccion-cabeza h2 {
+  margin: 0;
+  font-size: 20px;
+}
+.rt-filtro,
+.rt-filtro label {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 9px;
+}
+.rt-filtro select {
+  background: #151b2e;
+  border: 1px solid var(--linea-fuerte);
+  border-radius: 8px;
+  padding: 9px;
+  color: var(--texto);
+  font: inherit;
+  max-width: 100%;
+}
+.rt-sub {
+  display: block;
+  color: var(--texto-2);
+  font-size: 12px;
+  margin: 5px 0 0;
+}
+.rt-alcance {
+  max-width: 90ch;
+  margin: 13px 0 18px;
+  line-height: 1.7;
+}
+.rt-tabla {
+  width: 100%;
+  table-layout: fixed;
+}
+.rt-tabla th:first-child {
+  width: 25%;
+}
+.rt-tabla th:nth-child(2) {
+  width: 20%;
+}
+.rt-tabla th:nth-child(3) {
+  width: 16%;
+}
+.rt-tabla td {
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+.rt-tabla td,
+.rt-tabla th {
+  padding: 12px 10px;
+}
+.rt-tabla td:first-child a {
+  display: inline-block;
+  padding: 4px 0;
+}
+.rt-tabla .fila-sub {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.6;
+}
+.rt-seleccionado td {
+  background: rgba(110, 168, 254, 0.09);
+}
+.rt-ok {
+  color: var(--cobrado);
+}
+.rt-aviso {
+  color: var(--aviso-texto);
+}
+.rt-neutro {
+  color: var(--texto-2);
+}
+.rt-vtd {
+  color: var(--rt-almacen);
+}
+.rt-vta {
+  color: var(--retail);
+}
+.rt-sin-seleccion {
+  text-align: center;
+  margin: 22px 0;
+}
+.rt-expediente {
+  margin-top: 24px;
+  scroll-margin-top: 20px;
+}
+.rt-tipo {
+  display: block;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+.rt-estados {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 16px 0;
+  font-size: 13px;
+}
+.rt-detalle-rejilla {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 28px;
+  margin: 20px 0 26px;
+}
+.rt-expediente h3 {
+  margin: 22px 0 12px;
+  font-size: 15px;
+}
+.rt-expediente .tabla-scroll table {
+  min-width: 0;
+  width: 100%;
+  table-layout: fixed;
+}
+.rt-expediente table th:first-child {
+  width: 48%;
+}
+.rt-expediente table th:nth-child(2) {
+  width: 22%;
+}
+.rt-expediente table td {
+  overflow-wrap: anywhere;
+}
+.rt-expediente table .mono {
+  white-space: normal;
+}
+.rt-detalle-rejilla h3 {
+  margin-top: 0;
+}
+.rt-datos {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px 20px;
+  font-size: 13px;
+}
+.rt-datos dt {
+  color: var(--texto-2);
+}
+.rt-datos dd {
+  margin: 0;
+  text-align: right;
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+.rt-cronologia {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 16px;
+}
+.rt-cronologia li {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  gap: 12px;
+  font-size: 12px;
+}
+.rt-cronologia time {
+  color: var(--texto-3);
+  font-variant-numeric: tabular-nums;
+}
+.rt-cronologia p {
+  color: var(--texto-2);
+  margin: 5px 0 0;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+.rt-nota {
+  color: var(--texto-2);
+  font-size: 12px;
+  line-height: 1.7;
+  margin: 15px 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.rt-conjunto {
+  margin-top: 24px;
+  border-top: 1px solid var(--linea-fuerte);
+}
+.rt-conjunto ul {
+  padding: 0;
+  list-style: none;
+}
+.rt-conjunto li {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--linea);
+  font-size: 13px;
+}
+@media (max-width: 1050px) {
+  .rt-kpis {
+    gap: 10px;
+  }
+  .rt-lista,
+  .rt-expediente {
+    padding: 16px;
+  }
+  .rt-tabla {
+    font-size: 12px;
+  }
+  .rt-tabla td,
+  .rt-tabla th {
+    padding-left: 7px;
+    padding-right: 7px;
+  }
+}
+@media (max-width: 760px) {
+  .rt-kpis {
+    grid-template-columns: 1fr;
+  }
+  .rt-kpis .kpi-valor {
+    font-size: 28px;
+  }
+  .rt-detalle-rejilla {
+    grid-template-columns: 1fr;
+  }
+  .rt-expediente {
+    scroll-margin-top: 130px;
+  }
+  .rt-tabla,
+  .rt-tabla tbody {
+    display: block;
+  }
+  .rt-tabla thead {
+    display: none;
+  }
+  .rt-tabla tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    padding: 12px 0;
+    border-bottom: 1px solid var(--linea-fuerte);
+  }
+  .rt-tabla td {
+    display: block;
+    border: 0;
+    padding: 5px;
+  }
+  .rt-tabla td:first-child {
+    grid-column: 1;
+  }
+  .rt-tabla td:nth-child(2) {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  .rt-tabla td:nth-child(3) {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .rt-tabla td:nth-child(4) {
+    grid-column: 2;
+    grid-row: 2;
+    text-align: right;
+  }
+  .rt-tabla td:nth-child(5) {
+    grid-column: 1 / -1;
+    grid-row: 3;
+  }
+  .rt-tabla td[colspan] {
+    grid-column: 1 / -1;
+  }
+  .rt-filtro {
+    width: 100%;
+  }
+  .rt-filtro label {
+    flex: 1;
+  }
+  .rt-filtro select {
+    flex: 1;
+    min-width: 0;
+  }
+  .rt-cronologia li {
+    grid-template-columns: 100px minmax(0, 1fr);
+  }
+  .rt-tabs a {
+    padding: 10px;
+    gap: 8px;
+  }
+}
+@media (pointer: coarse) {
+  .rt-tabs a,
+  .rt-tabla td:first-child a,
+  .rt-filtro select {
+    min-height: 44px;
+  }
+}

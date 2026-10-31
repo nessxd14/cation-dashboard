@@ -14,7 +14,14 @@ export async function Periodos({
 }) {
   const filtros = leerFiltros(params);
   const extras = Object.fromEntries(
-    ["tipo", "alerta", "dimension", "mes"].flatMap((k) =>
+    [
+      "tipo",
+      "alerta",
+      "dimension",
+      "mes",
+      "retail_tipo",
+      "retail_estado",
+    ].flatMap((k) =>
       typeof params[k] === "string" ? [[k, params[k] as string]] : [],
     ),
   );
@@ -122,12 +129,18 @@ export async function Periodos({
       ) : null}
       {Object.keys(filtros).length > 0 ? (
         <p className="panel-sub">
-          Ventas: líneas coincidentes. Cobros retail: documento completo; pagos
-          a cuenta sin vínculo con sucursal, vendedor, canal o producto quedan
-          fuera al usar esos filtros. Cartera: saldo actual completo de los
-          clientes coincidentes. Caja, comisiones, cotizaciones y salud
-          conservan su alcance general. Inventario físico: solo sucursal y
-          producto.
+          {ruta === "/retail" ? (
+            "Los filtros seleccionan documentos retail completos. El período corresponde a la fecha de creación; el expediente conserva sus pagos y eventos posteriores."
+          ) : (
+            <>
+              Ventas: líneas coincidentes. Cobros retail: documento completo;
+              pagos a cuenta sin vínculo con sucursal, vendedor, canal o
+              producto quedan fuera al usar esos filtros. Cartera: saldo actual
+              completo de los clientes coincidentes. Caja, comisiones,
+              cotizaciones y salud conservan su alcance general. Inventario
+              físico: solo sucursal y producto.
+            </>
+          )}
         </p>
       ) : null}
     </div>

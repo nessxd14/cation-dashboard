@@ -12,7 +12,11 @@ const catalogos = {
   ],
   vendedores: [{ id: "ana", nombre: "Ana" }],
   clientes: [{ id: "5", nombre: "Cliente de ejemplo" }],
-  canales: [{ id: "MAYOR", nombre: "Mayor" }],
+  canales: [
+    { id: "MAYOR", nombre: "Mayor" },
+    { id: "VTD", nombre: "VTD" },
+    { id: "MOSTRADOR", nombre: "Mostrador" },
+  ],
   productos: [
     { id: "10", nombre: "Papel bond · hoja" },
     { id: "11", nombre: "Marcador azul · unidad" },
@@ -175,10 +179,11 @@ async function resolver(el) {
   }
   return el;
 }
-async function pagina(nombre) {
-  const params = new URLSearchParams({ p: "mes" });
+async function pagina(nombre, query = {}) {
+  const params = new URLSearchParams({ p: "mes", ...query });
   const mocks = {
     "@/lib/operativo": datos,
+    "@/lib/retail-servidor": require("../tests/retail-fixture.cjs"),
     "@/app/(dash)/configurar": {
       guardarMeta: () => {},
       guardarCosto: () => {},
@@ -232,6 +237,7 @@ async function pagina(nombre) {
   return (
     '<!doctype html><html lang="es"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>CATION · revisión visual</title><style>' +
     fs.readFileSync(path.resolve(__dirname, "../app/globals.css"), "utf8") +
+    fs.readFileSync(path.resolve(__dirname, "../app/retail.css"), "utf8") +
     "</style>" +
     renderToStaticMarkup(marco) +
     "</html>"
@@ -242,10 +248,17 @@ async function pagina(nombre) {
   for (const n of ["inventario", "margen", "metas", "cobranza", "detalle"])
     paginas[`/${n}`] = await pagina(n);
   http
-    .createServer((req, res) => {
+    .createServer(async (req, res) => {
       const u = new URL(req.url, "http://127.0.0.1:3208");
       res.setHeader("Content-Type", "text/html; charset=utf-8");
-      if (u.pathname === "/movil") {
+      if (u.pathname === "/retail") {
+        try {
+          res.end(await pagina("retail", Object.fromEntries(u.searchParams)));
+        } catch {
+          res.statusCode = 500;
+          res.end("No se pudo renderizar la revisión retail.");
+        }
+      } else if (u.pathname === "/movil") {
         res.end(
           `<html><body style="margin:0;background:#222;display:grid;place-items:center"><iframe title="Vista móvil" style="border:0;width:390px;height:844px" src="/${u.searchParams.get("pagina") || "inventario"}"></iframe></body></html>`,
         );

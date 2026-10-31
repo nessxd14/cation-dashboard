@@ -8,6 +8,7 @@ import "@fontsource/ibm-plex-mono/600.css";
 import "./globals.css";
 import "./wholesale.css";
 import "./vistas-wholesale.css";
+import "./retail.css";
 
 export const metadata: Metadata = {
   title: "Dashboard CATION",
