@@ -1,4 +1,4 @@
-param([switch]$SinAbrirNavegador, [switch]$SinPausa)
+param([switch]$SinAbrirNavegador, [switch]$SinPausa, [switch]$Reiniciar)
 $ErrorActionPreference = 'Stop'
 try {
   $nodeVideos = Join-Path $PSScriptRoot 'runtime\node.exe'
@@ -18,6 +18,21 @@ try {
   $logSalida = Join-Path $datosVideos 'inicio.salida.log'
   $servicioVideos = $null
   try { $servicioVideos = Invoke-RestMethod -Uri 'http://127.0.0.1:8767/v1/identidad' -TimeoutSec 1 } catch {}
+  if ($Reiniciar -and $servicioVideos) {
+    $configArchivo = Join-Path $datosVideos 'config.json'
+    if (-not (Test-Path -LiteralPath $configArchivo)) { throw 'No se pudo comprobar la identidad de esta instalacion.' }
+    $identidadVideos = Get-Content -LiteralPath $configArchivo -Raw -Encoding UTF8 | ConvertFrom-Json
+    if ($identidadVideos.id -ne $servicioVideos.id) { throw 'El puerto 8767 pertenece a otro equipo configurado.' }
+    $conexionVideos = Get-NetTCPConnection -LocalAddress 127.0.0.1 -LocalPort 8767 -State Listen -ErrorAction Stop | Select-Object -First 1
+    $procesoActual = Get-CimInstance Win32_Process -Filter "ProcessId=$($conexionVideos.OwningProcess)"
+    if (-not $procesoActual -or $procesoActual.Name -ne 'node.exe' -or
+        $procesoActual.CommandLine.IndexOf($scriptVideos, [StringComparison]::OrdinalIgnoreCase) -lt 0) {
+      throw 'Copia esta actualizacion en la carpeta original de CATION Videos y vuelve a ejecutar Actualizar.cmd.'
+    }
+    Stop-Process -Id $procesoActual.ProcessId -ErrorAction Stop
+    $servicioVideos = $null
+    Start-Sleep -Milliseconds 700
+  }
   if (-not $servicioVideos) {
     Set-Content -LiteralPath $logError -Value '' -Encoding UTF8
     Set-Content -LiteralPath $logSalida -Value '' -Encoding UTF8

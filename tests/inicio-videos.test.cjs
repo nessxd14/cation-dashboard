@@ -45,7 +45,7 @@ escribirPidPrueba(process.env.CATION_VIDEOS_DATOS+'/prueba.pid',String(process.p
       process.env.SystemRoot,
       "System32/WindowsPowerShell/v1.0/powershell.exe",
     );
-    const ejecutar = (envExtra = {}) =>
+    const ejecutar = (envExtra = {}, argumentos = []) =>
       spawnSync(
         powershell,
         [
@@ -55,6 +55,7 @@ escribirPidPrueba(process.env.CATION_VIDEOS_DATOS+'/prueba.pid',String(process.p
           path.join(programa, "Iniciar.ps1"),
           "-SinAbrirNavegador",
           "-SinPausa",
+          ...argumentos,
         ],
         {
           env: { ...process.env, CATION_VIDEOS_DATOS: datos, ...envExtra },
@@ -120,6 +121,13 @@ escribirPidPrueba(process.env.CATION_VIDEOS_DATOS+'/prueba.pid',String(process.p
             await fs.readFile(path.join(datos, "config.json"), "utf8"),
             "\uFEFF" + config,
           );
+          const reinicio = ejecutar({}, ["-Reiniciar"]);
+          assert.equal(reinicio.status, 0, reinicio.stdout + reinicio.stderr);
+          assert.notEqual(await fs.readFile(pidArchivo, "utf8"), pid);
+          const nueva = await (await fetch("http://127.0.0.1:8767/v1/identidad")).json();
+          assert.equal(nueva.id, identidad.id);
+          assert.notEqual(nueva.reto, identidad.reto);
+          assert.equal(await fs.readFile(path.join(datos, "config.json"), "utf8"), "\uFEFF" + config);
           await detenerPropio();
         },
       );

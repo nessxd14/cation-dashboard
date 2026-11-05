@@ -1,4 +1,4 @@
-// Puente local de CATION. Node.js >=22. Sin dependencias ni conexión saliente.
+// Puente local de CATION. Node.js >=22. Consulta el grabador solo en loopback.
 import http from "node:http";
 import path from "node:path";
 import os from "node:os";
@@ -194,7 +194,9 @@ export async function crearPuente({
     csrf = token(),
     reproducciones = new Map();
   let indice = new Map(),
+    nombresIndice = new Map(),
     escaneando = false,
+    ultimoEscaneo = 0,
     progreso = { revisados: 0, indexados: 0, error: null },
     raiz = null;
   const estado = () => ({
@@ -206,11 +208,13 @@ export async function crearPuente({
   });
   async function escanear() {
     if (escaneando) return;
+    ultimoEscaneo = Date.now();
     escaneando = true;
     progreso = { revisados: 0, indexados: 0, error: null };
     try {
       if (!config.carpeta) {
         indice = new Map();
+        nombresIndice = new Map();
         return;
       }
       raiz = await fs.realpath(config.carpeta);
@@ -221,6 +225,7 @@ export async function crearPuente({
             : [],
         ),
         nuevo = new Map(),
+        nombresNuevos = new Map(),
         persistir = [];
       async function recorrer(carpeta) {
         for (const e of await fs.readdir(carpeta, { withFileTypes: true })) {
@@ -275,6 +280,9 @@ export async function crearPuente({
             };
             if (!nuevo.has(clave)) nuevo.set(clave, registro);
             indice.set(clave, registro);
+            const aliases = nombresNuevos.get(e.name) || [];
+            aliases.push(registro);
+            nombresNuevos.set(e.name, aliases);
             persistir.push(registro);
             progreso.indexados = nuevo.size;
           } catch (e) {
@@ -285,11 +293,13 @@ export async function crearPuente({
       }
       await recorrer(raiz);
       indice = nuevo;
+      nombresIndice = nombresNuevos;
       await guardarJson(archivoCache, { raiz, archivos: persistir });
     } catch {
       progreso.error =
         "No se pudo completar la lectura de la carpeta. Comprueba que esté conectada y tengas permiso.";
       indice = new Map();
+      nombresIndice = new Map();
     } finally {
       escaneando = false;
     }
@@ -416,6 +426,7 @@ export async function crearPuente({
           config = { ...config, nombre: datos.nombre.trim(), carpeta };
           await guardarJson(archivoConfig, config);
           indice = new Map();
+          nombresIndice = new Map();
           reproducciones.clear();
         } else if (url.pathname !== "/config/escanear")
           throw problema(404, "No encontrado.");
@@ -493,6 +504,56 @@ export async function crearPuente({
         return responder(res, 200, estado(), {
           "Content-Type": "application/json",
         });
+      if (url.pathname === "/v1/preparacion" && req.method === "POST") {
+        const datos = await leerCuerpo(req);
+        if (![datos.pedido, datos.preparacion].every(id => typeof id === "string" && /^[1-9][0-9]{0,14}$/.test(id)))
+          throw problema(400, "Pedido o preparación inválidos.");
+        let respuesta;
+        try {
+          respuesta = await fetch(
+            "http://127.0.0.1:8091/api/lab/warehouse/dispatch/preparations/" +
+              datos.preparacion + "?pedido=" + datos.pedido,
+            { redirect: "error", signal: AbortSignal.timeout(8000) },
+          );
+        } catch {
+          return responder(res, 200, { ...estado(), resultado: "grabador_desconectado", clips: [] },
+            { "Content-Type": "application/json" });
+        }
+        if (respuesta.status === 404) {
+          return responder(res, 200, { ...estado(), resultado: "actualizacion_requerida", clips: [] },
+            { "Content-Type": "application/json" });
+        }
+        if (!respuesta.ok) throw problema(502, "El grabador no pudo consultar esta preparación.");
+        const grabacion = await respuesta.json();
+        if (typeof grabacion.found !== "boolean" || !Array.isArray(grabacion.cameras))
+          throw problema(502, "La respuesta del grabador no es compatible.");
+        if (!escaneando && Date.now() - ultimoEscaneo > 15000) void escanear();
+        const clips = [];
+        let esperados = 0, faltantes = 0;
+        for (const camera of grabacion.cameras) {
+          if (typeof camera.source !== "string" || !Array.isArray(camera.clips)) continue;
+          faltantes += Array.isArray(camera.gaps) ? camera.gaps.length : 0;
+          for (const clip of camera.clips) {
+            if (!/^[a-f0-9]{32}\.mp4$/.test(clip.name) || !Number.isFinite(clip.start) ||
+                !Number.isFinite(clip.end) || clip.end <= clip.start || !Number.isSafeInteger(clip.bytes)) continue;
+            esperados++;
+            const a = (nombresIndice.get(clip.name) || []).find(a => a.bytes === clip.bytes);
+            if (!a) continue;
+            try {
+              const opened = await abrirArchivo(a.clave);
+              await opened.archivo.close();
+            } catch { continue; }
+            clips.push({ ...visible(a), camara: camera.source, inicio: clip.start, fin: clip.end });
+          }
+        }
+        const resultado = !grabacion.found ? "sin_operacion"
+          : clips.length ? "encontrada"
+            : escaneando ? "indexando"
+              : esperados ? "carpeta_incorrecta" : "sin_video";
+        return responder(res, 200,
+          { ...estado(), resultado, clips, faltantes, ausentes: esperados - clips.length },
+          { "Content-Type": "application/json" });
+      }
       if (url.pathname === "/v1/archivos" && req.method === "GET") {
         const buscar = (url.searchParams.get("buscar") || "")
             .slice(0, 120)

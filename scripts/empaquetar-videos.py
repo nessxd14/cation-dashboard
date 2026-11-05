@@ -11,7 +11,7 @@ parser.add_argument('--licencia-runtime', type=Path)
 args = parser.parse_args()
 if args.runtime and (not args.licencia_runtime or not args.licencia_runtime.is_file()):
     parser.error('El runtime portátil requiere su licencia de redistribución.')
-files = ['servidor.mjs', 'Configurar.cmd', 'Configurar.ps1', 'Iniciar.cmd', 'Iniciar.ps1', 'Instalar-inicio.ps1', 'LEEME.md']
+files = ['servidor.mjs', 'Configurar.cmd', 'Configurar.ps1', 'Iniciar.cmd', 'Iniciar.ps1', 'Actualizar.cmd', 'Instalar-inicio.ps1', 'LEEME.md']
 args.destino.parent.mkdir(parents=True, exist_ok=True)
 with ZipFile(args.destino, 'w', ZIP_DEFLATED, compresslevel=9) as archive:
     for name in files:

@@ -24,6 +24,14 @@ El servicio escucha solo en loopback, valida Host para evitar DNS rebinding, res
 
 ## Referencias y disponibilidad
 
+Para grabaciones de CATION VLM, `/v1/preparacion` consulta exclusivamente el
+grabador de `127.0.0.1:8091` por ID de pedido y preparación. Solo ofrece clips
+que el grabador asignó a esa tanda y que el índice encuentra dentro de la
+carpeta autorizada. El Dashboard agrupa los tramos por cámara y continúa la
+reproducción cuando son consecutivos. El servicio conserva los permisos
+HMAC y no transmite sus tickets ni las credenciales al grabador. Los vínculos
+manuales continúan disponibles para videos externos.
+
 El primer escaneo calcula SHA-256 del contenido completo. El índice local cachea archivos sin cambios por ruta, tamaño, mtime, inode y device; la DB no recibe esas rutas. Un mismo contenido conserva su huella en distintas carpetas o con otro nombre. Se omiten archivos que cambian mientras se calcula la huella. El servicio comprueba sus metadatos otra vez antes de entregar bytes; un archivo modificado obliga a actualizar el índice.
 
 `analitica.pedido_video_local` conserva preparación, huella, nombre, tamaño, cámara y horarios opcionales. La preparación debe pertenecer al pedido WholeSale. Los enlaces se pueden actualizar o desactivar sin alterar operaciones o borrar el archivo. El expediente indica por separado servicio desconectado, disponibilidad pendiente y archivo ausente en esta PC. La fecha de modificación no se interpreta como hora de cámara. Los horarios opcionales ingresados se interpretan en America/La_Paz, independientemente de la zona de la PC.

@@ -48,6 +48,7 @@ test("paquete local: contiene solo el servicio actualizado y sus instrucciones, 
   assert.deepEqual(
     nombres.sort(),
     [
+      "Actualizar.cmd",
       "Configurar.ps1",
       "Configurar.cmd",
       "Iniciar.ps1",

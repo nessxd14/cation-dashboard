@@ -23,6 +23,18 @@ export type ArchivoLocal = {
   tipo: string;
   reproducible: boolean;
 };
+export type ClipPreparacionLocal = ArchivoLocal & {
+  camara: string;
+  inicio: number;
+  fin: number;
+};
+export type PreparacionLocal = EstadoPuente & {
+  resultado: "encontrada" | "sin_operacion" | "grabador_desconectado" | "actualizacion_requerida" |
+    "indexando" | "carpeta_incorrecta" | "sin_video";
+  clips: ClipPreparacionLocal[];
+  faltantes?: number;
+  ausentes?: number;
+};
 export type IdentidadPuente = {
   id: string;
   nombre: string;

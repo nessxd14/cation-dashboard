@@ -12,6 +12,72 @@ const {
 } = require("node:crypto");
 const cargar = require("./cargar.cjs");
 const origin = "https://cation-dashboard.vercel.app";
+
+test("preparación local: vincula clips exactos del grabador y conserva autenticación y carpeta", async () => {
+  const { crearPuente } = await import("../puente-videos/servidor.mjs");
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "cation-preparacion-"));
+  const realFetch = global.fetch;
+  let p;
+  try {
+    const carpeta = path.join(dir, "grabaciones");
+    const datos = path.join(dir, "equipo");
+    await fs.mkdir(carpeta);
+    await fs.mkdir(datos);
+    const nombre = "a".repeat(32) + ".mp4";
+    await fs.writeFile(path.join(carpeta, nombre), "video804");
+    await fs.writeFile(path.join(carpeta, "b".repeat(32) + ".mp4"), "otro");
+    const repetido = "c".repeat(32) + ".mp4";
+    await fs.writeFile(path.join(carpeta, repetido), "video804");
+    const config = { id: randomUUID(), clave: randomBytes(32).toString("hex"),
+      nombre: "PC de prueba", carpeta, dashboardOrigin: origin };
+    await fs.writeFile(path.join(datos, "config.json"), JSON.stringify(config));
+    p = await crearPuente({ carpetaDatos: datos, puerto: 0 });
+    await esperarIndice(p);
+    const identidad = await (await realFetch(p.url + "/v1/identidad", { headers: { Origin: origin } })).json();
+    const headers = { Origin: origin, Authorization: "Bearer " + firma(config, identidad.reto),
+      "Content-Type": "application/json" };
+    const llamadas = [];
+    global.fetch = async (url, options) => {
+      assert.equal(url.startsWith("http://127.0.0.1:8091/api/lab/warehouse/dispatch/preparations/"), true);
+      assert.equal(options.redirect, "error");
+      assert.equal(options.headers, undefined);
+      llamadas.push(url);
+      const found = url.endsWith("/110?pedido=904");
+      return new Response(JSON.stringify({ found, cameras: found ? [{
+        source: "nvr-1234567890123456-canal-7", gaps: [], clips: [
+          { name: nombre, bytes: 8, start: 1000, end: 1008 },
+          { name: repetido, bytes: 8, start: 1008, end: 1016 },
+          { name: "../privado.mp4", bytes: 8, start: 1000, end: 1008 }
+        ]
+      }] : [] }), { status: 200 });
+    };
+    const post = (body, auth = true) => realFetch(p.url + "/v1/preparacion", {
+      method: "POST", headers: auth ? headers : { Origin: origin, "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+    assert.equal((await post({ pedido: "904", preparacion: "110" }, false)).status, 401);
+    assert.equal(llamadas.length, 0);
+    assert.equal((await post({ pedido: "../archivo", preparacion: "110" })).status, 400);
+    assert.equal(llamadas.length, 0);
+    const result = await (await post({ pedido: "904", preparacion: "110" })).json();
+    assert.equal(result.resultado, "encontrada");
+    assert.equal(result.clips.length, 2);
+    assert.equal(result.clips[0].clave, result.clips[1].clave);
+    assert.equal(result.clips[0].nombre, nombre);
+    assert.equal(result.clips[0].inicio, 1000);
+    assert.equal(Object.hasOwn(result.clips[0], "ruta"), false);
+    assert.equal(JSON.stringify(result).includes(carpeta), false);
+    const other = await (await post({ pedido: "904", preparacion: "111" })).json();
+    assert.equal(other.resultado, "sin_operacion");
+    assert.deepEqual(other.clips, []);
+    global.fetch = async () => new Response("{}", { status: 404 });
+    assert.equal((await (await post({ pedido: "904", preparacion: "110" })).json()).resultado, "actualizacion_requerida");
+  } finally {
+    global.fetch = realFetch;
+    if (p) await p.close();
+    await fs.rm(dir, { recursive: true, force: true });
+  }
+});
 function firma(config, reto, extras = {}) {
   const carga = Buffer.from(
     JSON.stringify({

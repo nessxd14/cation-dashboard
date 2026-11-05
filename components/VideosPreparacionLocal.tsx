@@ -21,6 +21,8 @@ import {
   desvincularVideoLocal,
 } from "@/app/(dash)/videos/acciones";
 import { fechaWholesale } from "@/lib/wholesale";
+import { ClipsPreparacionLocal } from "./ClipsPreparacionLocal";
+import type { PreparacionLocal } from "@/lib/videos-locales";
 
 function ReproductorLocal({
   video,
@@ -118,6 +120,8 @@ export function VideosPreparacionLocal({
   const [conexion, setConexion] = useState<ConexionLocal | null>(null);
   const [estado, setEstado] = useState<EstadoPuente | null>(null);
   const [disponibles, setDisponibles] = useState<ArchivoLocal[] | null>(null);
+  const [automatica, setAutomatica] = useState<PreparacionLocal | null>(null);
+  const [avisoGrabador, setAvisoGrabador] = useState("");
   const [archivos, setArchivos] = useState<ArchivoLocal[]>([]),
     [buscar, setBuscar] = useState(""),
     [pagina, setPagina] = useState(1),
@@ -145,11 +149,23 @@ export function VideosPreparacionLocal({
       setConexion(c);
       setDisponibles(r.archivos);
       setEstado(r);
+      try {
+        const resultado = await consultarPuente<PreparacionLocal>(c, "/v1/preparacion", { pedido, preparacion });
+        if (actual !== revision.current) return;
+        setAutomatica(resultado);
+        setEstado(resultado);
+        setAvisoGrabador("");
+      } catch {
+        if (actual !== revision.current) return;
+        setAutomatica(null);
+        setAvisoGrabador("Actualiza CATION Videos para encontrar automáticamente los clips del grabador.");
+      }
       localStorage.setItem(PREFERENCIA_VIDEO_LOCAL, "1");
     } catch (e) {
       if (actual !== revision.current) return;
       setConexion(null);
       setDisponibles(null);
+      setAutomatica(null);
       setError(
         e instanceof Error ? e.message : "No se pudo consultar esta PC.",
       );
@@ -160,6 +176,8 @@ export function VideosPreparacionLocal({
   useEffect(() => {
     let actual = true;
     setDisponibles(null);
+    setAutomatica(null);
+    setAvisoGrabador("");
     setElegir(false);
     setSeleccion("");
     if (localStorage.getItem(PREFERENCIA_VIDEO_LOCAL) === "1")
@@ -171,6 +189,11 @@ export function VideosPreparacionLocal({
       revision.current++;
     };
   }, [preparacion, referenciasKey]);
+  useEffect(() => {
+    if (!automatica?.escaneando) return;
+    const timer = setTimeout(() => void comprobar(), 4000);
+    return () => clearTimeout(timer);
+  }, [automatica]);
   async function biblioteca(p = 1) {
     if (!conexion) return;
     setOcupado(true);
@@ -304,7 +327,23 @@ export function VideosPreparacionLocal({
           {mensaje}
         </p>
       ) : null}
-      {!referencias.length ? (
+      {avisoGrabador ? <p className="ws-aviso">{avisoGrabador}</p> : null}
+      {automatica ? (
+        <>
+          {automatica.resultado === "grabador_desconectado" ? <p className="ws-aviso">Inicia el grabador CATION VLM en esta PC y vuelve a comprobar.</p> : null}
+          {automatica.resultado === "actualizacion_requerida" ? <p className="ws-aviso">Actualiza CATION VLM para consultar los clips por pedido y preparación.</p> : null}
+          {automatica.resultado === "indexando" ? <p className="fila-sub" role="status">Identificando los clips de esta preparación. La consulta se actualizará al terminar.</p> : null}
+          {automatica.resultado === "carpeta_incorrecta" ? <p className="ws-aviso">El grabador tiene clips para esta preparación, pero faltan en la carpeta configurada en CATION Videos. Selecciona la misma carpeta de grabaciones y actualízala.</p> : null}
+          {automatica.resultado === "sin_operacion" ? <p className="fila-sub">El grabador de esta PC todavía no tiene registrada esta preparación del pedido.</p> : null}
+          {automatica.resultado === "sin_video" ? <p className="fila-sub">La preparación está registrada, pero no tiene fragmentos de video guardados en el grabador.</p> : null}
+          {automatica.faltantes || automatica.ausentes ? <p className="ws-aviso">La cobertura es parcial. Hay intervalos sin video o fragmentos ausentes en esta PC.</p> : null}
+          {conexion ? [...new Set(automatica.clips.map(c => c.camara))].map(camara =>
+            <ClipsPreparacionLocal key={camara + ":" + conexion.identidad.reto}
+              clips={automatica.clips.filter(c => c.camara === camara)} conexion={conexion} />
+          ) : null}
+        </>
+      ) : null}
+      {!referencias.length && !automatica?.clips.length ? (
         <p className="ws-vacio">
           No hay videos locales vinculados a esta preparación.
         </p>
