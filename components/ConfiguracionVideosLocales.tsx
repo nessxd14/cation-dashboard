@@ -75,8 +75,8 @@ export function ConfiguracionVideosLocales() {
             y extraer el ZIP.
           </li>
           <li>
-            Ejecutar <strong>Configurar.ps1</strong>, elegir la carpeta de
-            grabaciones y abrir la configuración local.
+            Hacer doble clic en <strong>Configurar.cmd</strong>, elegir la
+            carpeta de grabaciones y abrir la configuración local.
           </li>
           <li>
             Copiar el código de vinculación que muestra la configuración y

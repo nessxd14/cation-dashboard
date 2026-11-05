@@ -4,7 +4,9 @@ Implementación para el expediente WholeSale y la pantalla `/videos`. Los archiv
 
 ## Instalación
 
-En el Dashboard, **Videos locales → Descargar CATION Videos para Windows** entrega el servicio sin runtime. Extraer el ZIP, ejecutar `Configurar.ps1`, elegir carpeta, iniciar el servicio y copiar su código en el Dashboard. Para PCs sin Node se puede entregar el paquete portátil Windows x64 con `runtime/node.exe` y su licencia. Requiere Node.js 22 o posterior. La configuración y el índice son por cuenta Windows en `%LOCALAPPDATA%\CationVideos`, fuera de la carpeta de instalación. No copiar `config.json` entre PCs.
+En el Dashboard, **Videos locales → Descargar CATION Videos para Windows** entrega el servicio sin runtime. Extraer el ZIP, hacer doble clic en `Configurar.cmd`, elegir carpeta, iniciar el servicio y copiar su código en el Dashboard. Para PCs sin Node se puede entregar el paquete portátil Windows x64 con `runtime/node.exe` y su licencia. Requiere Node.js 22 o posterior. La configuración y el índice son por cuenta Windows en `%LOCALAPPDATA%\CationVideos`, fuera de la carpeta de instalación. No copiar `config.json` entre PCs.
+
+Para una PC ya configurada, ejecutar `Iniciar.cmd`. Los lanzadores conservan visible cualquier error, comprueban Node con `--version` (compatible con Windows PowerShell 5) y esperan la respuesta del servicio antes de abrir el navegador. Si el arranque falla, muestran el registro `%LOCALAPPDATA%\CationVideos\inicio.error.log`. Una actualización reemplaza los archivos del programa sin modificar la configuración ni las grabaciones.
 
 El inicio automático es opcional con `Instalar-inicio.ps1`: crea un acceso en Inicio de la cuenta actual y un lanzador oculto. No requiere abrir puertos o instalar un servicio como administrador. El script no cambia la política global de ejecución de PowerShell. La carpeta del programa debe conservarse.
 

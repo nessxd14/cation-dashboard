@@ -325,7 +325,7 @@ export async function crearPuente({
     }
   }
   function paginaConfig() {
-    return `<!doctype html><html lang="es"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CATION · Videos de esta PC</title><style>body{font:16px/1.6 system-ui;background:#0b1222;color:#eff3fa;max-width:760px;margin:40px auto;padding:0 20px}label{display:block;margin:20px 0 6px}input,textarea,button{font:inherit;box-sizing:border-box;padding:10px;border-radius:7px;border:1px solid #53637e;background:#18233a;color:inherit}input,textarea{width:100%}button{margin:16px 8px 0 0;cursor:pointer}small{color:#bdc9dd}code{overflow-wrap:anywhere}#estado{white-space:pre-wrap}a{color:#9fc5ff}</style><h1>Videos de esta PC</h1><p>Los archivos se leen de la carpeta que elijas y permanecen en este equipo.</p><form id="config"><label>Nombre del equipo<input name="nombre" maxlength="100" value="${escapar(config.nombre)}" required></label><label>Carpeta de videos<input name="carpeta" value="${escapar(config.carpeta || "")}" placeholder="D:\\Grabaciones\\Almacen" required></label><small>Puedes pegar una ruta distinta en cada PC. También puedes elegirla al ejecutar Configurar.ps1.</small><button>Guardar carpeta</button><button type="button" id="escanear">Actualizar carpeta</button></form><h2>Vincular con el Dashboard</h2><p>En el Dashboard abre <a href="${escapar(config.dashboardOrigin)}/videos" target="_blank" rel="noreferrer">Videos locales</a>, pega este código y pulsa Vincular esta PC.</p><textarea readonly aria-label="Código de vinculación" rows="4">${escapar(config.id + ":" + config.clave)}</textarea><small>Este código pertenece solo a este servicio. Compártelo únicamente con las cuentas autorizadas del Dashboard.</small><h2>Estado</h2><p id="estado" aria-live="polite"></p><script>const csrf=${JSON.stringify(csrf)};async function estado(){const r=await fetch('/config/estado');const s=await r.json();document.querySelector('#estado').textContent=(s.configurada?'Carpeta configurada. ':'Selecciona una carpeta. ')+(s.escaneando?'Revisando '+s.revisados+' archivos…':s.total+' videos disponibles.')+(s.error?'\n'+s.error:'');}async function enviar(url,body){const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json','X-Cation-CSRF':csrf},body:JSON.stringify(body)});const s=await r.json();if(!r.ok)throw new Error(s.error);await estado();}document.querySelector('#config').onsubmit=async e=>{e.preventDefault();try{await enviar('/config',Object.fromEntries(new FormData(e.target)));}catch(e){document.querySelector('#estado').textContent=e.message;}};document.querySelector('#escanear').onclick=async()=>{try{await enviar('/config/escanear',{});}catch(e){document.querySelector('#estado').textContent=e.message;}};estado();setInterval(estado,3000);</script></html>`;
+    return `<!doctype html><html lang="es"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CATION · Videos de esta PC</title><style>body{font:16px/1.6 system-ui;background:#0b1222;color:#eff3fa;max-width:760px;margin:40px auto;padding:0 20px}label{display:block;margin:20px 0 6px}input,textarea,button{font:inherit;box-sizing:border-box;padding:10px;border-radius:7px;border:1px solid #53637e;background:#18233a;color:inherit}input,textarea{width:100%}button{margin:16px 8px 0 0;cursor:pointer}small{color:#bdc9dd}code{overflow-wrap:anywhere}#estado{white-space:pre-wrap}a{color:#9fc5ff}</style><h1>Videos de esta PC</h1><p>Los archivos se leen de la carpeta que elijas y permanecen en este equipo.</p><form id="config"><label>Nombre del equipo<input name="nombre" maxlength="100" value="${escapar(config.nombre)}" required></label><label>Carpeta de videos<input name="carpeta" value="${escapar(config.carpeta || "")}" placeholder="D:\\Grabaciones\\Almacen" required></label><small>Puedes pegar una ruta distinta en cada PC. También puedes elegirla al ejecutar Configurar.cmd.</small><button>Guardar carpeta</button><button type="button" id="escanear">Actualizar carpeta</button></form><h2>Vincular con el Dashboard</h2><p>En el Dashboard abre <a href="${escapar(config.dashboardOrigin)}/videos" target="_blank" rel="noreferrer">Videos locales</a>, pega este código y pulsa Vincular esta PC.</p><textarea readonly aria-label="Código de vinculación" rows="4">${escapar(config.id + ":" + config.clave)}</textarea><small>Este código pertenece solo a este servicio. Compártelo únicamente con las cuentas autorizadas del Dashboard.</small><h2>Estado</h2><p id="estado" aria-live="polite"></p><script>const csrf=${JSON.stringify(csrf)};async function estado(){const r=await fetch('/config/estado');const s=await r.json();document.querySelector('#estado').textContent=(s.configurada?'Carpeta configurada. ':'Selecciona una carpeta. ')+(s.escaneando?'Revisando '+s.revisados+' archivos…':s.total+' videos disponibles.')+(s.error?'\n'+s.error:'');}async function enviar(url,body){const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json','X-Cation-CSRF':csrf},body:JSON.stringify(body)});const s=await r.json();if(!r.ok)throw new Error(s.error);await estado();}document.querySelector('#config').onsubmit=async e=>{e.preventDefault();try{await enviar('/config',Object.fromEntries(new FormData(e.target)));}catch(e){document.querySelector('#estado').textContent=e.message;}};document.querySelector('#escanear').onclick=async()=>{try{await enviar('/config/escanear',{});}catch(e){document.querySelector('#estado').textContent=e.message;}};estado();setInterval(estado,3000);</script></html>`;
   }
   function responder(res, status, body, headers = {}) {
     res.writeHead(status, {
@@ -619,19 +619,24 @@ if (
 ) {
   const datos = process.env.CATION_VIDEOS_DATOS || directorioDatos();
   crearPuente({ carpetaDatos: datos })
-    .then((p) => {
-      process.stdout.write(
-        `CATION Videos: ${p.url}\nConfiguración por equipo: ${datos}\n`,
-      );
+    .then(async (p) => {
+      const mensaje = `CATION Videos: ${p.url}\nConfiguración por equipo: ${datos}\n`;
+      await fs
+        .appendFile(path.join(datos, "inicio.salida.log"), mensaje)
+        .catch(() => {});
+      process.stdout.write(mensaje);
       for (const s of ["SIGINT", "SIGTERM"])
         process.on(s, () => p.close().then(() => process.exit(0)));
     })
-    .catch((e) => {
-      process.stderr.write(
+    .catch(async (e) => {
+      const mensaje =
         (e.code === "EADDRINUSE"
           ? "El servicio ya está iniciado en esta PC. Abre http://127.0.0.1:8767"
-          : e.message) + "\n",
-      );
+          : e.message) + "\n";
+      await fs
+        .appendFile(path.join(datos, "inicio.error.log"), mensaje)
+        .catch(() => {});
+      process.stderr.write(mensaje);
       process.exitCode = 1;
     });
 }

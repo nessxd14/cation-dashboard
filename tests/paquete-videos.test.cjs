@@ -31,6 +31,13 @@ test("paquete local: contiene solo el servicio actualizado y sus instrucciones, 
         "efbbbf",
         "PowerShell 5 necesita BOM para los textos en español",
       );
+    if (nombre.endsWith(".cmd")) {
+      assert.ok(
+        contenido.includes(Buffer.from("\r\n")),
+        "CMD usa finales de línea Windows",
+      );
+      assert.match(contenido.toString(), /if errorlevel 1 \([\s\S]*pause/);
+    }
     assert.equal(
       normalizar(contenido),
       normalizar(fs.readFileSync(path.join(raiz, "puente-videos", nombre))),
@@ -42,7 +49,9 @@ test("paquete local: contiene solo el servicio actualizado y sus instrucciones, 
     nombres.sort(),
     [
       "Configurar.ps1",
+      "Configurar.cmd",
       "Iniciar.ps1",
+      "Iniciar.cmd",
       "Instalar-inicio.ps1",
       "LEEME.md",
       "servidor.mjs",

@@ -1,5 +1,6 @@
-param([switch]$SinIniciar)
+param([switch]$SinIniciar, [switch]$SinPausa)
 $ErrorActionPreference = 'Stop'
+try {
 Add-Type -AssemblyName System.Windows.Forms
 $datosVideos = Join-Path $env:LOCALAPPDATA 'CationVideos'
 New-Item -ItemType Directory -Path $datosVideos -Force | Out-Null
@@ -41,4 +42,10 @@ $sidVideos = [System.Security.Principal.WindowsIdentity]::GetCurrent().User.Valu
 if ($LASTEXITCODE -ne 0) { throw 'No se pudo proteger la configuración del equipo.' }
 Write-Host 'Carpeta configurada:' $carpetaVideos
 Write-Host 'Abre Videos locales en el Dashboard y pega el código que muestra la configuración local.'
-if (-not $SinIniciar) { & (Join-Path $PSScriptRoot 'Iniciar.ps1') }
+if (-not $SinIniciar) { & (Join-Path $PSScriptRoot 'Iniciar.ps1') -SinPausa:$SinPausa }
+} catch {
+  Write-Host 'No se pudo configurar CATION Videos:' -ForegroundColor Red
+  Write-Host $_.Exception.Message
+  if (-not $SinPausa -and -not [Console]::IsInputRedirected) { Read-Host 'Pulsa Enter para cerrar' | Out-Null }
+  exit 1
+}

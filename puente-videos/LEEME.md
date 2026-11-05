@@ -1,7 +1,7 @@
 # CATION Videos · servicio por PC
 
 1. Extrae el ZIP en una carpeta estable de la PC.
-2. Haz clic derecho en **Configurar.ps1 → Ejecutar con PowerShell**. Elige la carpeta que contiene los videos. Puede ser distinta en cada PC.
+2. Haz doble clic en **Configurar.cmd**. Elige la carpeta que contiene los videos. Puede ser distinta en cada PC.
 3. Se abre `http://127.0.0.1:8767`. Copia su código de vinculación.
 4. En el Dashboard abre **Videos locales**, pega el código y pulsa **Vincular esta PC**. Acepta el acceso local cuando lo solicite el navegador.
 5. En **Pedidos**, abre el expediente, una preparación y la etapa **Alistado** o **Verificación**. Pulsa **Comprobar en esta PC → Vincular archivo local**.
@@ -12,7 +12,11 @@ Los archivos originales se leen y permanecen en su carpeta. No se suben videos a
 
 La primera lectura calcula las huellas completas y puede tardar con grabaciones grandes. Los archivos ya identificados están disponibles mientras continúa la lectura. Las siguientes reutilizan el índice de archivos sin cambios. No se siguen enlaces simbólicos. Los archivos que siguen grabándose se omiten si cambian durante el cálculo; vuelve a actualizar cuando termine su escritura.
 
-**Iniciar.ps1** inicia el servicio y abre su configuración. **Instalar-inicio.ps1** agrega un acceso al inicio de Windows para la cuenta actual; es opcional y requiere conservar la carpeta del programa. La carpeta de grabaciones se puede cambiar desde la configuración local. Primero espera a que termine una indexación en curso.
+**Iniciar.cmd** inicia el servicio y abre su configuración cuando ya elegiste una carpeta. Espera a que responda antes de abrir el navegador y reutiliza el servicio si ya está iniciado. Si ocurre un error, la ventana permanece abierta para poder leerlo. Los detalles del servidor quedan en `%LOCALAPPDATA%\CationVideos\inicio.error.log`. Los archivos `.cmd` ejecutan los scripts `.ps1` incluidos, sin cambiar las políticas de PowerShell.
+
+Para actualizar, extrae el nuevo ZIP en la carpeta del programa y reemplaza sus archivos. Se conserva la configuración de esta cuenta en `%LOCALAPPDATA%\CationVideos` y la carpeta de grabaciones. Después ejecuta **Iniciar.cmd**. No es necesario volver a elegir la carpeta ni vincular la PC si ya se hizo.
+
+**Instalar-inicio.ps1** agrega un acceso al inicio de Windows para la cuenta actual; es opcional y requiere conservar la carpeta del programa. La carpeta de grabaciones se puede cambiar desde la configuración local. Primero espera a que termine una indexación en curso.
 
 Si Windows bloquea los scripts descargados, abre las propiedades del ZIP original, marca **Desbloquear**, vuelve a extraerlo y ejecuta el script. No cambies globalmente las políticas de seguridad de PowerShell. Si tu organización restringe scripts, solicita que el administrador permita este paquete.
 
