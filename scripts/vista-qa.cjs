@@ -238,6 +238,10 @@ async function pagina(nombre, query = {}) {
     '<!doctype html><html lang="es"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>CATION · revisión visual</title><style>' +
     fs.readFileSync(path.resolve(__dirname, "../app/globals.css"), "utf8") +
     fs.readFileSync(path.resolve(__dirname, "../app/retail.css"), "utf8") +
+    fs.readFileSync(
+      path.resolve(__dirname, "../app/videos-locales.css"),
+      "utf8",
+    ) +
     "</style>" +
     renderToStaticMarkup(marco) +
     "</html>"
@@ -245,7 +249,14 @@ async function pagina(nombre, query = {}) {
 }
 (async () => {
   const paginas = {};
-  for (const n of ["inventario", "margen", "metas", "cobranza", "detalle"])
+  for (const n of [
+    "inventario",
+    "margen",
+    "metas",
+    "cobranza",
+    "detalle",
+    "videos",
+  ])
     paginas[`/${n}`] = await pagina(n);
   http
     .createServer(async (req, res) => {

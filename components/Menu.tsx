@@ -20,6 +20,7 @@ const PANTALLAS = [
   { href: "/pedidos", texto: "Pedidos", extra: "WholeSale" },
   { href: "/retail", texto: "Ventas retail", extra: "VTD · VTA" },
   { href: "/almacen", texto: "Almacén" },
+  { href: "/videos", texto: "Videos locales", extra: "Esta PC" },
   { href: "/finanzas", texto: "Finanzas" },
   { href: "/inventario", texto: "Inventario" },
   { href: "/margen", texto: "Margen" },

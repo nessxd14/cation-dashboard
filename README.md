@@ -29,6 +29,7 @@ En Vercel: mismas dos variables de entorno, sin pasos extra.
 | `/finanzas` | Listo (Fase 3, migración `2026-10-13_dash_finanzas.sql`) |
 | `/pedidos` | Consolidado WholeSale: expediente, evidencias y contexto para OpenClaw |
 | `/retail` | Ventas retail VTD/VTA: documentos, pagos, entrega y cobros conjuntos |
+| `/videos` | Configuración por PC y reproducción de videos locales en el expediente |
 | `/detalle`, `/inventario`, `/margen`, `/metas`, `/cobranza` | Listo (Dashboard operativo) |
 | `/auditoria` La Chismosa | Cuando La Chismosa suba al repo |
 
@@ -37,3 +38,5 @@ El efecto vidrio se apaga solo en equipos que no lo soportan o con "reducir tran
 El contrato de WholeSale, las lecturas de OpenClaw y el registro de clips están en [docs/wholesale-openclaw.md](docs/wholesale-openclaw.md).
 
 La consulta de VTD/VTA y sus reglas de importes, cobros y entregas están en [docs/retail-vtd-vta.md](docs/retail-vtd-vta.md).
+
+La instalación del servicio de videos y la configuración de carpeta por PC están en [docs/videos-locales.md](docs/videos-locales.md). Grabador Dahua DHI-XVR5216AN-S2 pendiente de conexión.

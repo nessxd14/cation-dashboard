@@ -9,6 +9,7 @@ import "./globals.css";
 import "./wholesale.css";
 import "./vistas-wholesale.css";
 import "./retail.css";
+import "./videos-locales.css";
 
 export const metadata: Metadata = {
   title: "Dashboard CATION",

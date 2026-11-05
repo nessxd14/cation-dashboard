@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { EstadoEtapaWholesale } from "./EstadoEtapaWholesale";
+import { VideosPreparacionLocal } from "./VideosPreparacionLocal";
 import { estadosEtapasWholesale } from "@/lib/wholesale-estados";
 import {
   ETAPAS,
@@ -450,10 +451,15 @@ export function ExpedientePedido({
                       ))}
                     {!d.clips.some((c) => c.preparacion_id === a.id) ? (
                       <p className="ws-vacio">
-                        Sin clip vinculado a esta preparación. La conexión al
-                        grabador está pendiente.
+                        Sin clips almacenados en línea para esta preparación.
                       </p>
                     ) : null}
+                    <VideosPreparacionLocal
+                      key={a.id}
+                      pedido={p.id}
+                      preparacion={a.id}
+                      videos={d.videos_locales ?? []}
+                    />
                   </section>
                 </>
               ) : null}

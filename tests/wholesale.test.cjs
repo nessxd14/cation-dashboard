@@ -7,7 +7,9 @@ test("expediente renderiza etapas reales y diferencia evidencias ausentes de cli
   const React = require("react");
   const { renderToString } = require("react-dom/server");
   const { expediente } = require("./wholesale-fixture.cjs");
-  const { ExpedientePedido } = cargar("components/ExpedientePedido.tsx");
+  const { ExpedientePedido } = cargar("components/ExpedientePedido.tsx", {
+    "next/navigation": { useRouter: () => ({ refresh() {} }) },
+  });
   for (const etapa of ws.ETAPAS) {
     const html = renderToString(
       React.createElement(ExpedientePedido, {

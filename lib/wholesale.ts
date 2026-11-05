@@ -226,6 +226,7 @@ export type ExpedienteWholesale = {
     fin: string;
     disponible: boolean;
   }[];
+  videos_locales?: import("./videos-locales").VideoLocal[];
   lecturas_ia: {
     id: string;
     resumen: string;

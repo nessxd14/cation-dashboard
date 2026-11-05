@@ -54,6 +54,12 @@ La UI calcula preparado −5 minutos a verificado +5 minutos por preparación. S
 
 Todavía se requiere conectar el NVR/DVR y conocer cámaras, retención y desfase horario. No se ha implementado una extracción ficticia ni tareas programadas contra equipos desconocidos.
 
+### Videos disponibles en la PC
+
+La integración local está en [docs/videos-locales.md](videos-locales.md). El expediente permite vincular videos de una carpeta y reproducirlos mediante CATION Videos en `127.0.0.1`. Cada PC configura su propia carpeta. La DB conserva referencias y huellas SHA-256, sin recibir los archivos. Si una copia del mismo video está en otra PC, se reconoce aunque su ruta o nombre sea diferente; si falta, aparece como no disponible allí. Estos vínculos son independientes de los clips en Storage descritos a continuación. El inicio y fin de grabación solo se muestran cuando se registraron explícitamente; no se deducen de fechas del archivo o de la ventana solicitada.
+
+La extracción desde el grabador **Dahua DHI-XVR5216AN-S2** queda pendiente de configurar y verificar su acceso, cámaras, reloj y exportación. Las referencias del expediente no dan a OpenClaw acceso al contenido del archivo local.
+
 Cuando el puente tenga un clip real, debe subirlo al bucket privado `wholesale-clips` con sus credenciales de servidor y registrar:
 
 ```sql
