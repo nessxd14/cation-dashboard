@@ -3,6 +3,7 @@ import { cache } from "react";
 import { crearClienteServidor } from "./supabase/server";
 import { ErrorDatos } from "./datos";
 import type { Catalogos, Filtros } from "./filtros";
+import type { Auditoria, AreaAuditoria, VistaAuditoria } from "./auditoria";
 
 export type FilaDetalle = {
   id: string;
@@ -17,6 +18,36 @@ export type FilaDetalle = {
   producto_id: string | null;
 };
 export type Detalle = { total: number; monto: number; filas: FilaDetalle[] };
+export type ActividadDiaria = {
+  id: string;
+  tipo: "pedidos" | "vtd" | "traslados";
+  documento: string;
+  referencia_id: string;
+  fecha: string;
+  evento: string;
+  tono: "verde" | "azul" | "ambar" | "rojo";
+  etapa: "pedido" | "alistado" | "verificacion" | "salida" | null;
+};
+export type PagoCuenta = {
+  id: string;
+  medio: string;
+  estado: string;
+  monto: number;
+  aplicado: number;
+  sin_asignar: number | null;
+  devuelto: number;
+  creado_en: string;
+  registrado_por: string | null;
+  confirmado_en: string | null;
+  confirmado_por: string | null;
+};
+export type CuentaCobranza = {
+  id: string;
+  nombre: string;
+  saldo: number | null;
+  en_revision: number | null;
+  pagos: PagoCuenta[];
+};
 export type ProductoInventario = {
   id: string;
   producto: string;
@@ -109,6 +140,24 @@ export async function rpc<T>(
 }
 
 export const obtenerCatalogos = cache(() => rpc<Catalogos>("dash_catalogos"));
+export const obtenerActividadDia = (fecha: string) =>
+  rpc<ActividadDiaria[]>("dash_actividad_dia", { p_fecha: fecha });
+export const obtenerCuentaCobranza = (cliente: string) =>
+  rpc<CuentaCobranza | null>("dash_cuenta_cobranza", { p_cliente: cliente });
+export const obtenerAuditoria = (
+  vista: VistaAuditoria,
+  desde: string,
+  hasta: string,
+  area: AreaAuditoria | "",
+  pagina: number,
+) =>
+  rpc<Auditoria>("dash_auditoria", {
+    p_vista: vista,
+    p_desde: vista === "eventos" ? desde : null,
+    p_hasta: vista === "eventos" ? hasta : null,
+    p_area: area,
+    p_pagina: pagina,
+  });
 export const obtenerDetalle = (
   tipo: string,
   desde: string,

@@ -13,6 +13,7 @@ const PRESENTACIONES = [
   { id: "pagina", nombre: "Página", simbolo: "▤" },
   { id: "panel", nombre: "Panel lateral", simbolo: "◧" },
   { id: "ventana", nombre: "Ventana", simbolo: "▣" },
+  { id: "resumen", nombre: "Resumen", simbolo: "☷" },
 ] as const;
 type Presentacion = (typeof PRESENTACIONES)[number]["id"];
 type Retorno = {
@@ -61,19 +62,25 @@ function guardarRetorno(clave: string, retorno: Retorno) {
 export function VisorDetalle({
   lista,
   detalle,
+  resumen,
   seleccion,
   titulo,
   volver,
   preferenciaId,
   etiquetaLista = "lista",
+  abrirEtapa = false,
+  vistaPagina = false,
 }: {
   lista: ReactNode;
   detalle: ReactNode;
+  resumen: ReactNode;
   seleccion: string | null;
   titulo: string;
   volver: string;
   preferenciaId: string;
   etiquetaLista?: string;
+  abrirEtapa?: boolean;
+  vistaPagina?: boolean;
 }) {
   const [modo, setModo] = useState<Presentacion>("pagina"),
     [cerrado, setCerrado] = useState(false),
@@ -88,11 +95,15 @@ export function VisorDetalle({
   useEffect(() => {
     try {
       const v = localStorage.getItem(clave);
-      setModo(valida(v) ? v : "pagina");
+      setModo(
+        !vistaPagina && valida(v) && !(abrirEtapa && v === "resumen")
+          ? v
+          : "pagina",
+      );
     } catch {
       setModo("pagina");
     }
-  }, [clave]);
+  }, [clave, abrirEtapa, vistaPagina]);
   useLayoutEffect(() => {
     if (anterior.current.seleccion !== seleccion) {
       anterior.current.seleccion = seleccion;
@@ -162,7 +173,7 @@ export function VisorDetalle({
           toolbar.current
             ?.querySelector("button")
             ?.focus({ preventScroll: true });
-        if (modo === "pagina")
+        if (modo === "pagina" || modo === "resumen")
           el.scrollIntoView({ block: "start", behavior: "instant" });
       }
     } else if (el.open) el.close();
@@ -287,7 +298,7 @@ export function VisorDetalle({
         >
           <div ref={toolbar} className="vd-barra-detalle">
             <button type="button" className="vd-volver" onClick={cerrar}>
-              {modo === "pagina"
+              {modo === "pagina" || modo === "resumen"
                 ? `← Volver a ${etiquetaLista}`
                 : modo === "panel"
                   ? "Cerrar panel ×"
@@ -296,7 +307,13 @@ export function VisorDetalle({
             {selector}
           </div>
           <div className="vd-cuerpo-detalle" aria-busy={pendiente}>
-            {detalle}
+            <div
+              className="vd-contenido-expediente"
+              hidden={modo === "resumen"}
+            >
+              {detalle}
+            </div>
+            {modo === "resumen" ? resumen : null}
           </div>
         </dialog>
       </div>

@@ -12,6 +12,7 @@ import {
   dineroWholesale as dinero,
   cantidadWholesale as cantidad,
   historialWholesale,
+  enlaceTelegram,
   ventanaCamara,
   comandoOpenClaw,
   type Etapa,
@@ -70,65 +71,77 @@ export function ExpedientePedido({
   const visibles = todos ? eventos : eventos.slice(-12);
   const urlArchivo = (tipo: string, id: string, indice = 0) =>
     `/pedidos/archivo?${new URLSearchParams({ pedido: p.id, tipo, id, indice: String(indice) })}`;
-  const evidencia = (e: EvidenciaWholesale) => (
-    <section className="ws-evidencia" key={`${e.tipo}:${e.id}`}>
-      <strong>
-        {e.tipo === "pago"
-          ? "Comprobante de pago"
-          : `Evidencia de ${e.etapa === "SALIDA" ? "salida" : "preparación"}`}{" "}
-        · #{e.id.slice(0, 8)}
-      </strong>
-      <p className="fila-sub">
-        {fecha(e.creado_en)} · {e.estado}
-        {e.preparacion_id ? ` · preparación #${e.preparacion_id}` : ""}
-      </p>
-      {e.descripcion ? (
-        <details>
-          <summary>Descripción de origen</summary>
-          <p className="ws-prewrap">{e.descripcion}</p>
-        </details>
-      ) : null}
-      <div className="ws-fotos">
-        {e.archivos.map((f) =>
-          !f.disponible ? (
-            <p key={f.indice} className="ws-archivo-ausente">
-              Archivo {f.indice + 1}: no disponible en Storage
-              {e.eliminado_en ? ` · eliminado ${fecha(e.eliminado_en)}` : ""}
-            </p>
-          ) : e.mime && !e.mime.startsWith("image/") ? (
-            <a
-              key={f.indice}
-              className="boton-vidrio"
-              href={urlArchivo(e.tipo, e.id, f.indice)}
-              target="_blank"
-              rel="noreferrer"
-            >
-              Abrir documento {f.indice + 1} ↗
-            </a>
-          ) : (
-            <ImagenEvidencia
-              key={`${e.id}:${f.indice}`}
-              url={urlArchivo(e.tipo, e.id, f.indice)}
-              texto={`Evidencia ${e.etapa.toLowerCase()} de ${p.numero}, archivo ${f.indice + 1}`}
-            />
-          ),
-        )}
-      </div>
-      {!e.archivos.length ? (
-        <p className="apagado">Sin archivos asociados a este registro.</p>
-      ) : null}
-      {e.telegram?.length ? (
+  const evidencia = (e: EvidenciaWholesale) => {
+    const telegram = enlaceTelegram(e);
+    return (
+      <section className="ws-evidencia" key={`${e.tipo}:${e.id}`}>
+        <strong>
+          {e.tipo === "pago"
+            ? "Comprobante de pago"
+            : `Evidencia de ${e.etapa === "SALIDA" ? "salida" : "preparación"}`}{" "}
+          · #{e.id.slice(0, 8)}
+        </strong>
         <p className="fila-sub">
-          Referencias en Telegram:{" "}
-          {e.telegram
-            .map((t) => t.message_id)
-            .filter(Boolean)
-            .join(", ") || "Registradas"}
-          . El envío a Telegram no garantiza que el archivo siga en Storage.
+          {fecha(e.creado_en)} · {e.estado}
+          {e.preparacion_id ? ` · preparación #${e.preparacion_id}` : ""}
         </p>
-      ) : null}
-    </section>
-  );
+        {e.descripcion ? (
+          <details>
+            <summary>Descripción de origen</summary>
+            <p className="ws-prewrap">{e.descripcion}</p>
+          </details>
+        ) : null}
+        <div className="ws-fotos">
+          {e.archivos.map((f) =>
+            !f.disponible ? (
+              <p key={f.indice} className="ws-archivo-ausente">
+                Archivo {f.indice + 1}: no disponible en Storage
+                {e.eliminado_en ? ` · eliminado ${fecha(e.eliminado_en)}` : ""}
+              </p>
+            ) : e.mime && !e.mime.startsWith("image/") ? (
+              <a
+                key={f.indice}
+                className="boton-vidrio"
+                href={urlArchivo(e.tipo, e.id, f.indice)}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Abrir documento {f.indice + 1} ↗
+              </a>
+            ) : (
+              <ImagenEvidencia
+                key={`${e.id}:${f.indice}`}
+                url={urlArchivo(e.tipo, e.id, f.indice)}
+                texto={`Evidencia ${e.etapa.toLowerCase()} de ${p.numero}, archivo ${f.indice + 1}`}
+              />
+            ),
+          )}
+        </div>
+        {!e.archivos.length ? (
+          <p className="apagado">Sin archivos asociados a este registro.</p>
+        ) : null}
+        {telegram ? (
+          <a
+            className="boton-vidrio"
+            href={telegram}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Ver evidencia en Telegram ↗
+          </a>
+        ) : e.telegram?.length ? (
+          <p className="fila-sub">
+            Referencias en Telegram:{" "}
+            {e.telegram
+              .map((t) => t.message_id)
+              .filter(Boolean)
+              .join(", ") || "Registradas"}
+            . El envío a Telegram no garantiza que el archivo siga en Storage.
+          </p>
+        ) : null}
+      </section>
+    );
+  };
   const evidencias = d.evidencias.filter((e) =>
     etapa === "pago"
       ? e.tipo === "pago"
@@ -397,7 +410,7 @@ export function ExpedientePedido({
                     </table>
                   </div>
                   <section className="ws-camara" aria-label="Ventana de cámara">
-                    <h4>La Chismosa · ventana solicitada</h4>
+                    <h4>Ventana sugerida de grabación</h4>
                     {ventana ? (
                       <>
                         <p className="mono">
@@ -527,10 +540,8 @@ export function ExpedientePedido({
                     </p>
                   </div>
                 ))}
-              <p className="ws-vacio">
-                Horas de llegada y salida de La Chismosa: sin integración
-                vinculada a este pedido. La hora de despacho no se utiliza como
-                hora de visita.
+              <p className="fila-sub">
+                La hora de despacho no se utiliza como hora de visita.
               </p>
             </>
           ) : null}

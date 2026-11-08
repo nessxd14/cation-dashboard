@@ -693,12 +693,7 @@ tr:last-child td {
   box-shadow: 0 0 10px var(--critico);
 }
 
-/* ---------- Chismosa ---------- */
-.punteado {
-  border-style: dashed;
-  border-color: rgba(255, 255, 255, 0.32);
-  background: rgba(255, 255, 255, 0.05);
-}
+/* ---------- Indicadores compactos ---------- */
 .mini-kpis {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

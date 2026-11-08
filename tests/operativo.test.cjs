@@ -101,6 +101,38 @@ test("exportación rechaza cuentas sin autorización antes de consultar datos", 
   assert.equal(r.status, 403);
   assert.equal(llamadas, 0);
 });
+test("catálogos comerciales conserva el permiso de la consulta y evita caché compartida", async () => {
+  let autorizado = false;
+  const catalogos = {
+    sucursales: [],
+    vendedores: [],
+    clientes: [],
+    canales: [],
+    productos: [],
+  };
+  const { GET } = cargar("app/filtros/catalogos/route.ts", {
+    "./supabase/server": {
+      crearClienteServidor: async () => ({
+        rpc: async (nombre) => {
+          assert.equal(nombre, "dash_catalogos");
+          return autorizado
+            ? { data: catalogos }
+            : { error: { code: "42501" } };
+        },
+      }),
+    },
+    react: { ...require("react"), cache: (fn) => fn },
+  });
+  const denegada = await GET();
+  assert.equal(denegada.status, 403);
+  assert.equal(denegada.headers.get("Cache-Control"), "private, no-store");
+  assert.equal((await denegada.json()).clientes, undefined);
+  autorizado = true;
+  const disponible = await GET();
+  assert.equal(disponible.status, 200);
+  assert.equal(disponible.headers.get("Cache-Control"), "private, no-store");
+  assert.deepEqual(await disponible.json(), catalogos);
+});
 test("servidor valida metas y costos antes de llamar a la base", async () => {
   let llamadas = 0;
   const mocks = {

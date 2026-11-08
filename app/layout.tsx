@@ -10,6 +10,7 @@ import "./wholesale.css";
 import "./vistas-wholesale.css";
 import "./retail.css";
 import "./videos-locales.css";
+import "./vistas-operativas.css";
 
 export const metadata: Metadata = {
   title: "Dashboard CATION",

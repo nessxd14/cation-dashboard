@@ -1,9 +1,9 @@
 import { OPCIONES, type Periodo } from "@/lib/periodo";
 import { leerFiltros, consultaComun, type Parametros } from "@/lib/filtros";
-import { obtenerCatalogos } from "@/lib/operativo";
+import { FiltrosComerciales } from "./FiltrosComerciales";
 
 /** Selector de período por URL (?p=…). El rango usa un formulario GET simple. */
-export async function Periodos({
+export function Periodos({
   periodo,
   ruta,
   params = {},
@@ -25,7 +25,6 @@ export async function Periodos({
       typeof params[k] === "string" ? [[k, params[k] as string]] : [],
     ),
   );
-  const catalogos = await obtenerCatalogos();
   return (
     <div className="selector-comun no-imprimir">
       <div
@@ -74,54 +73,17 @@ export async function Periodos({
           <button type="submit">Ver</button>
         </form>
       </div>
-      <details
-        className="filtros-desplegables"
-        open={Object.keys(filtros).length > 0}
-      >
-        <summary>
-          Filtros comerciales
-          {Object.keys(filtros).length
-            ? ` · ${Object.keys(filtros).length} activos`
-            : " · sucursal, vendedor, cliente, canal y producto"}
-        </summary>
-        <form method="get" action={ruta} className="filtros vidrio">
-          {Object.entries(extras).map(([k, v]) => (
-            <input key={k} type="hidden" name={k} value={v} />
-          ))}
-          {[...consultaComun(params)]
-            .filter(([k]) => ["p", "desde", "hasta"].includes(k))
-            .map(([k, v]) => (
-              <input key={k} type="hidden" name={k} value={v} />
-            ))}
-          {(
-            [
-              ["sucursal", "Sucursal", "sucursales"],
-              ["vendedor", "Vendedor", "vendedores"],
-              ["cliente", "Cliente", "clientes"],
-              ["canal", "Canal", "canales"],
-              ["producto", "Producto", "productos"],
-            ] as const
-          ).map(([clave, label, catalogo]) => (
-            <label key={clave}>
-              {label}
-              <select name={clave} defaultValue={filtros[clave] ?? ""}>
-                <option value="">Todos</option>
-                {catalogos[catalogo].map((o) => (
-                  <option key={o.id} value={o.id}>
-                    {o.nombre}
-                  </option>
-                ))}
-              </select>
-            </label>
-          ))}
-          <button className="boton-vidrio">Aplicar filtros</button>
-          <a
-            href={`${ruta}?${new URLSearchParams({ ...extras, p: periodo.clave, desde: periodo.desde, hasta: periodo.hasta })}`}
-          >
-            Limpiar filtros
-          </a>
-        </form>
-      </details>
+      <FiltrosComerciales
+        ruta={ruta}
+        filtros={filtros}
+        ocultos={[
+          ...Object.entries(extras),
+          ...[...consultaComun(params)].filter(([k]) =>
+            ["p", "desde", "hasta"].includes(k),
+          ),
+        ]}
+        limpiar={`${ruta}?${new URLSearchParams({ ...extras, p: periodo.clave, desde: periodo.desde, hasta: periodo.hasta })}`}
+      />
       {periodo.aviso ? (
         <p className="aviso" role="alert">
           {periodo.aviso}
