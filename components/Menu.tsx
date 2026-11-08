@@ -2,14 +2,14 @@
 
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { salir } from "@/app/login/actions";
 import { alternarLiviano } from "@/app/(dash)/actions";
 import { consultaComun } from "@/lib/filtros";
 
 type Props = {
   correo: string;
-  alertas: number;
+  alertas: ReactNode;
   hora: string;
   liviano: boolean;
 };
@@ -27,7 +27,7 @@ const PANTALLAS = [
   { href: "/metas", texto: "Metas" },
   { href: "/cobranza", texto: "Cobranza" },
   { href: "/salud", texto: "Salud de datos", corto: "Salud", alertas: true },
-  { href: "/auditoria", texto: "Auditoría", extra: "Chismosa" },
+  { href: "/auditoria", texto: "Auditoría" },
 ] as const;
 
 /** Datos de la cuenta y acciones. En escritorio va al pie del menú; en el celular, dentro de "Cuenta". */
@@ -109,11 +109,7 @@ export function Menu({ correo, alertas, hora, liviano }: Props) {
                 p.texto
               )}
             </span>
-            {"alertas" in p && alertas > 0 ? (
-              <span className="insignia mono" aria-label={`${alertas} alertas`}>
-                {alertas}
-              </span>
-            ) : null}
+            {"alertas" in p ? alertas : null}
             {"extra" in p ? (
               <span className="nav-extra solo-escritorio">{p.extra}</span>
             ) : null}

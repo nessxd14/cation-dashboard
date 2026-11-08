@@ -23,7 +23,7 @@ export function FilaPedidoWholesale({
     <tr className={seleccionado ? "ws-seleccionado" : undefined}>
       <td>
         <a
-          href={enlaceWholesale(params, { pedido: p.id, etapa: "pedido" })}
+          href={enlaceWholesale(params, { pedido: p.id })}
           data-abrir-detalle={p.id}
           aria-current={seleccionado ? "true" : undefined}
         >

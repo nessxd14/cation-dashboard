@@ -4,7 +4,8 @@ import { Kpi, Panel } from "@/components/piezas";
 import { Paginacion } from "@/components/Paginacion";
 import { enlace, leerFiltros, type Parametros } from "@/lib/filtros";
 import { obtenerCobranza, paginaValida } from "@/lib/operativo";
-import { bs, diaMes, entero } from "@/lib/formato";
+import { diaMes, entero } from "@/lib/formato";
+import { dineroWholesale as dinero } from "@/lib/wholesale";
 import { enlaceOrigen } from "@/lib/enlaces";
 import { redirect } from "next/navigation";
 
@@ -34,13 +35,13 @@ export default async function CobranzaPage({
       <section className="kpis">
         <Kpi
           nombre="Saldo por cobrar"
-          valor={bs(clientes.reduce((s, c) => s + c.saldo, 0))}
+          valor={dinero(clientes.reduce((s, c) => s + c.saldo, 0))}
           nota={`${entero(clientes.length)} clientes`}
           color="var(--cartera)"
         />
         <Kpi
           nombre="Vencido"
-          valor={bs(clientes.reduce((s, c) => s + c.vencido, 0))}
+          valor={dinero(clientes.reduce((s, c) => s + c.vencido, 0))}
           nota="Documentos con fecha de vencimiento superada"
           color="var(--critico)"
         />
@@ -55,7 +56,7 @@ export default async function CobranzaPage({
         titulo="A quién cobrar primero"
         sub="Alta: vencido ≥30 días. Media: otro vencido. Preventiva: saldo sin vencimiento superado. Esta lista no envía mensajes."
       >
-        <div className="tabla-scroll">
+        <div className="tabla-scroll tabla-operativa">
           <table>
             <thead>
               <tr>
@@ -72,11 +73,11 @@ export default async function CobranzaPage({
                 const origen = enlaceOrigen("CUENTA", c.id);
                 return (
                   <tr key={c.id}>
-                    <td>
+                    <th scope="row">
                       {c.cliente}
                       {c.sin_partida > 0 ? (
                         <span className="fila-sub">
-                          Sin partida: {bs(c.sin_partida)}
+                          Sin partida: {dinero(c.sin_partida)}
                         </span>
                       ) : null}
                       {c.por_verificar > 0 ? (
@@ -84,17 +85,17 @@ export default async function CobranzaPage({
                           {c.por_verificar} pagos por verificar
                         </span>
                       ) : null}
-                    </td>
+                    </th>
                     <td>
                       <span
-                        className={`etiqueta ${c.prioridad === "ALTA" ? "etiqueta-aviso" : ""}`}
+                        className={`vista-insignia vista-${c.prioridad === "ALTA" ? "rojo" : c.prioridad === "MEDIA" ? "ambar" : "azul"}`}
                       >
                         {c.prioridad}
                       </span>
                     </td>
-                    <td className="der mono">{bs(c.saldo)}</td>
+                    <td className="der mono">{dinero(c.saldo)}</td>
                     <td className="der mono">
-                      {bs(c.vencido)}
+                      {dinero(c.vencido)}
                       <span className="fila-sub">
                         {c.dias_vencido === null
                           ? "Sin plazo"
@@ -106,8 +107,9 @@ export default async function CobranzaPage({
                         ? diaMes(fecha(c.ultimo_pago))
                         : "Sin pagos"}
                     </td>
-                    <td>
+                    <td className="tabla-operativa-acciones">
                       <Link
+                        className="boton-vidrio vista-accion"
                         href={enlace(
                           "/detalle",
                           { ...params, cliente: c.id },

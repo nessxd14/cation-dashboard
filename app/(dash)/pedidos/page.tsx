@@ -21,6 +21,7 @@ import {
 import { enlaceOrigen } from "@/lib/enlaces";
 import { FilaPedidoWholesale } from "@/components/FilaPedidoWholesale";
 import { LeyendaEtapasWholesale } from "@/components/EstadoEtapaWholesale";
+import { ResumenPedidoWholesale } from "@/components/ResumenPedidoWholesale";
 
 export default async function PedidosPage({
   searchParams,
@@ -33,26 +34,28 @@ export default async function PedidosPage({
   const buscar =
     typeof params.buscar === "string" ? params.buscar.trim().slice(0, 120) : "";
   const filtros = leerFiltros(params);
-  const lista = await obtenerPedidosWholesale(
-    periodo.desde,
-    periodo.hasta,
-    filtros,
-    buscar,
-    pagina,
-  );
-  if (pagina > 1 && (pagina - 1) * 25 >= lista.total)
-    redirect(enlaceWholesale(params, { pagina: "" }));
   if (params.pedido !== undefined && !idWholesale(params.pedido)) notFound();
   const pedido = idWholesale(params.pedido);
   const antes = idWholesale(params.antes);
-  const d = pedido ? await obtenerExpedienteWholesale(pedido, antes) : null;
-  const etapa =
-    typeof params.etapa === "string" && ETAPAS.includes(params.etapa as Etapa)
-      ? (params.etapa as Etapa)
-      : "pedido";
+  const [lista, d, usuario] = await Promise.all([
+    obtenerPedidosWholesale(
+      periodo.desde,
+      periodo.hasta,
+      filtros,
+      buscar,
+      pagina,
+    ),
+    pedido ? obtenerExpedienteWholesale(pedido, antes) : null,
+    usuarioActual(),
+  ]);
+  if (pagina > 1 && (pagina - 1) * 25 >= lista.total)
+    redirect(enlaceWholesale(params, { pagina: "" }));
+  const abrirEtapa =
+    typeof params.etapa === "string" && ETAPAS.includes(params.etapa as Etapa);
+  const etapa = abrirEtapa ? (params.etapa as Etapa) : "pedido";
+  const vistaPagina = params.vista === "pagina";
   const paginas = Math.max(1, Math.ceil(lista.total / 25));
   const comun = consultaComun(params);
-  const usuario = await usuarioActual();
   return (
     <div className="wholesale-reportes">
       <Cabecera
@@ -68,6 +71,11 @@ export default async function PedidosPage({
         volver={enlaceWholesale(params)}
         preferenciaId={usuario?.id ?? "local"}
         etiquetaLista="pedidos"
+        abrirEtapa={abrirEtapa}
+        vistaPagina={vistaPagina}
+        resumen={
+          d ? <ResumenPedidoWholesale datos={d} params={params} /> : null
+        }
         lista={
           <Panel
             titulo="Seguimiento por pedido"
@@ -188,6 +196,7 @@ export default async function PedidosPage({
                         pedido: d.pedido.id,
                         etapa: "pago",
                         antes: String(d.cobros.siguiente),
+                        vista: vistaPagina ? "pagina" : "",
                       })
                     : null
                 }

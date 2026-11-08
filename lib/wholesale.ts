@@ -127,7 +127,18 @@ export type EvidenciaWholesale = {
   mime?: string;
   archivos: { indice: number; disponible: boolean }[];
   telegram?: { message_id?: number }[];
+  telegram_enlace?: string | null;
 };
+
+export function enlaceTelegram(e: EvidenciaWholesale): string | null {
+  const url = e.telegram_enlace;
+  return e.tipo === "operacion" &&
+    e.estado === "ENVIADO" &&
+    url &&
+    /^https:\/\/t\.me\/c\/(?:[1-9]\d*\/){2}[1-9]\d*$/.test(url)
+    ? url
+    : null;
+}
 export type ExpedienteWholesale = {
   pedido: PedidoWholesale;
   consultado_en: string;

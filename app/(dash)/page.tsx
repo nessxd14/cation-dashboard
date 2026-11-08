@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import { Periodos } from "@/components/Periodos";
+import { ActividadDia } from "@/components/ActividadDia";
 import {
   SerieDiaria,
   TRAMO_PEDIDOS,
@@ -7,7 +9,6 @@ import {
 } from "@/components/SerieDiaria";
 import { Kpi, ListaBarras, Panel } from "@/components/piezas";
 import { ListaSalud } from "@/components/ListaSalud";
-import { Chismosa } from "@/components/Chismosa";
 import { ErrorDatos, obtenerResumen, obtenerSalud } from "@/lib/datos";
 import { ErrorConsulta } from "@/components/ErrorConsulta";
 import {
@@ -16,6 +17,7 @@ import {
   diaLargo,
   diaMes,
   entero,
+  hoyLaPaz,
   nombre,
   titulo,
 } from "@/lib/formato";
@@ -24,6 +26,20 @@ import { enlace, leerFiltros } from "@/lib/filtros";
 import { Herramientas } from "@/components/Herramientas";
 
 const RETAIL = new Set(["MOSTRADOR", "VTD"]);
+
+async function SaludResumen() {
+  try {
+    return <ListaSalud indicadores={await obtenerSalud()} />;
+  } catch (error) {
+    if (error instanceof ErrorDatos)
+      return (
+        <p className="aviso" role="status">
+          {error.message}
+        </p>
+      );
+    throw error;
+  }
+}
 
 export default async function ResumenPage({
   searchParams,
@@ -48,10 +64,11 @@ async function ContenidoResumen({
 }) {
   const params = await searchParams;
   const periodo = leerPeriodo(params);
-  const [r, salud] = await Promise.all([
-    obtenerResumen(periodo.desde, periodo.hasta, leerFiltros(params)),
-    obtenerSalud(),
-  ]);
+  const r = await obtenerResumen(
+    periodo.desde,
+    periodo.hasta,
+    leerFiltros(params),
+  );
 
   // Los pagos de cuenta cargados en la actualización de octubre inflan el "cobrado".
   const cobradoDistorsionado =
@@ -91,6 +108,10 @@ async function ContenidoResumen({
         </span>
         <span className="pildora">{r.hoy.por_comprar} ítems por comprar</span>
       </section>
+
+      <ActividadDia
+        fecha={periodo.desde === periodo.hasta ? periodo.desde : hoyLaPaz()}
+      />
 
       <section aria-label="Indicadores" className="kpis">
         <Kpi
@@ -309,9 +330,22 @@ async function ContenidoResumen({
             </Link>
           }
         >
-          <ListaSalud indicadores={salud} />
+          <Suspense
+            fallback={
+              <p className="apagado" role="status">
+                Consultando salud de datos…
+              </p>
+            }
+          >
+            <SaludResumen />
+          </Suspense>
         </Panel>
-        <Chismosa />
+        <Panel
+          titulo="Auditoría"
+          sub="Pendientes actuales y eventos registrados por área"
+        >
+          <Link href="/auditoria">Abrir Auditoría →</Link>
+        </Panel>
       </div>
 
       <footer className="pie">

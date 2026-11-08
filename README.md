@@ -31,7 +31,7 @@ En Vercel: mismas dos variables de entorno, sin pasos extra.
 | `/retail` | Ventas retail VTD/VTA: documentos, pagos, entrega y cobros conjuntos |
 | `/videos` | Configuración por PC y reproducción de videos locales en el expediente |
 | `/detalle`, `/inventario`, `/margen`, `/metas`, `/cobranza` | Listo (Dashboard operativo) |
-| `/auditoria` La Chismosa | Cuando La Chismosa suba al repo |
+| `/auditoria` Auditoría | Pendientes actuales y eventos por período y área |
 
 El efecto vidrio se apaga solo en equipos que no lo soportan o con "reducir transparencia"; también hay un botón "Modo liviano" en el menú.
 
