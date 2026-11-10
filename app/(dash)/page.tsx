@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { Periodos } from "@/components/Periodos";
 import { ActividadDia } from "@/components/ActividadDia";
+import { NovedadesDia } from "@/components/NovedadesDia";
 import {
   SerieDiaria,
   TRAMO_PEDIDOS,
@@ -70,6 +71,8 @@ async function ContenidoResumen({
     leerFiltros(params),
   );
 
+  const diaConsultado = periodo.desde === periodo.hasta ? periodo.desde : hoyLaPaz();
+
   // Los pagos de cuenta cargados en la actualización de octubre inflan el "cobrado".
   const cobradoDistorsionado =
     r.cobrado.prev > 0 && r.cobrado.cuenta > r.cobrado.prev * 5;
@@ -109,9 +112,9 @@ async function ContenidoResumen({
         <span className="pildora">{r.hoy.por_comprar} ítems por comprar</span>
       </section>
 
-      <ActividadDia
-        fecha={periodo.desde === periodo.hasta ? periodo.desde : hoyLaPaz()}
-      />
+      <NovedadesDia fecha={diaConsultado} />
+
+      <ActividadDia fecha={diaConsultado} />
 
       <section aria-label="Indicadores" className="kpis">
         <Kpi
