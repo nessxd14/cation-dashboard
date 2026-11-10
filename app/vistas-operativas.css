@@ -153,3 +153,79 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+.vista-violeta {
+  --vista-color: #dcc8ff;
+  --vista-borde: #7d63ad;
+  --vista-fondo: rgba(112, 76, 176, 0.22);
+}
+.novedades {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 440px;
+  overflow-y: auto;
+}
+.novedad {
+  display: grid;
+  grid-template-columns: 52px 190px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 4px;
+  border-top: 1px solid var(--linea-fuerte);
+}
+.novedad-hora {
+  color: var(--texto-2);
+}
+.novedad-evento {
+  justify-self: start;
+}
+.novedad-cuerpo {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.novedad-doc {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.novedad-detalle {
+  color: var(--texto-2);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.novedad-monto {
+  text-align: right;
+  white-space: nowrap;
+}
+@media (max-width: 720px) {
+  .novedades-filtros {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    width: 100%;
+    padding-bottom: 4px;
+  }
+  .novedades-filtros button {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+  .novedad {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      "hora evento monto"
+      "cuerpo cuerpo cuerpo";
+    row-gap: 4px;
+  }
+  .novedad-hora {
+    grid-area: hora;
+  }
+  .novedad-evento {
+    grid-area: evento;
+  }
+  .novedad-monto {
+    grid-area: monto;
+  }
+  .novedad-cuerpo {
+    grid-area: cuerpo;
+  }
+}

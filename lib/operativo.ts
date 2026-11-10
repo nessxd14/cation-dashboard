@@ -28,6 +28,29 @@ export type ActividadDiaria = {
   tono: "verde" | "azul" | "ambar" | "rojo";
   etapa: "pedido" | "alistado" | "verificacion" | "salida" | null;
 };
+export type TipoNovedad =
+  | "pedido"
+  | "cotizacion"
+  | "vtd"
+  | "cobro"
+  | "cliente"
+  | "anulacion"
+  | "traslado"
+  | "caja";
+export type Novedad = {
+  id: string;
+  tipo: TipoNovedad;
+  documento: string;
+  referencia_id: string | null;
+  fecha: string;
+  evento: string;
+  detalle: string | null;
+  origen: string | null;
+  monto: number | null;
+  con_signo: boolean;
+  usuario: string | null;
+  tono: "verde" | "azul" | "ambar" | "rojo" | "violeta";
+};
 export type PagoCuenta = {
   id: string;
   medio: string;
@@ -142,6 +165,8 @@ export async function rpc<T>(
 export const obtenerCatalogos = cache(() => rpc<Catalogos>("dash_catalogos"));
 export const obtenerActividadDia = (fecha: string) =>
   rpc<ActividadDiaria[]>("dash_actividad_dia", { p_fecha: fecha });
+export const obtenerNovedadesDia = (fecha: string) =>
+  rpc<Novedad[]>("dash_novedades_dia", { p_fecha: fecha });
 export const obtenerCuentaCobranza = (cliente: string) =>
   rpc<CuentaCobranza | null>("dash_cuenta_cobranza", { p_cliente: cliente });
 export const obtenerAuditoria = (
