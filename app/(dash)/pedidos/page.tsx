@@ -16,6 +16,7 @@ import {
   ETAPAS,
   idWholesale,
   enlaceWholesale,
+  ordenWholesale,
   type Etapa,
 } from "@/lib/wholesale";
 import { enlaceOrigen } from "@/lib/enlaces";
@@ -34,6 +35,7 @@ export default async function PedidosPage({
   const buscar =
     typeof params.buscar === "string" ? params.buscar.trim().slice(0, 120) : "";
   const filtros = leerFiltros(params);
+  const orden = ordenWholesale(params.orden);
   if (params.pedido !== undefined && !idWholesale(params.pedido)) notFound();
   const pedido = idWholesale(params.pedido);
   const antes = idWholesale(params.antes);
@@ -44,6 +46,7 @@ export default async function PedidosPage({
       filtros,
       buscar,
       pagina,
+      orden,
     ),
     pedido ? obtenerExpedienteWholesale(pedido, antes) : null,
     usuarioActual(),
@@ -79,12 +82,38 @@ export default async function PedidosPage({
         lista={
           <Panel
             titulo="Seguimiento por pedido"
-            sub="El período filtra la fecha de creación del pedido. El expediente incluye todo su historial. Los filtros seleccionan pedidos completos, no recortan sus líneas."
+            sub={
+              (orden === "actividad"
+                ? "Ordenado por la actividad más reciente: el período filtra la actividad del pedido (creación, edición, almacén, salida o cobro), no su fecha de creación."
+                : "El período filtra la fecha de creación del pedido.") +
+              " El expediente incluye todo su historial. Los filtros seleccionan pedidos completos, no recortan sus líneas."
+            }
           >
+            <div className="ws-orden" role="group" aria-label="Ordenar por">
+              <span>Ordenar por</span>
+              <a
+                href={enlaceWholesale(params, { orden: "", pagina: "" })}
+                aria-current={orden === "actividad" ? "true" : undefined}
+              >
+                Actividad reciente
+              </a>
+              <a
+                href={enlaceWholesale(params, {
+                  orden: "creacion",
+                  pagina: "",
+                })}
+                aria-current={orden === "creacion" ? "true" : undefined}
+              >
+                Fecha de creación
+              </a>
+            </div>
             <form className="ws-buscar" action="/pedidos" method="get">
               {Array.from(comun.entries()).map(([k, v]) => (
                 <input key={k} type="hidden" name={k} value={v} />
               ))}
+              {orden === "creacion" ? (
+                <input type="hidden" name="orden" value="creacion" />
+              ) : null}
               <label>
                 Pedido o cliente
                 <input
@@ -120,6 +149,9 @@ export default async function PedidosPage({
                 <thead>
                   <tr>
                     <th>Pedido / cliente</th>
+                    <th aria-sort={orden === "actividad" ? "descending" : undefined}>
+                      Última actividad
+                    </th>
                     <th>Cotización</th>
                     <th>Pedido</th>
                     <th>Alistado</th>
@@ -139,7 +171,7 @@ export default async function PedidosPage({
                   ))}
                   {!lista.filas.length ? (
                     <tr>
-                      <td colSpan={7}>
+                      <td colSpan={8}>
                         No hay pedidos WholeSale con estos filtros.
                       </td>
                     </tr>

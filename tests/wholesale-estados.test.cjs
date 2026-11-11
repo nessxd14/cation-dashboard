@@ -93,6 +93,47 @@ test("salida exige líneas vigentes completas y movimientos vigentes", () => {
   );
 });
 
+test("última actividad: tipo, tono, hora, creado y orden en los enlaces", () => {
+  const { FilaPedidoWholesale, tonoActividad } = cargar(
+    "components/FilaPedidoWholesale.tsx",
+  );
+  const { ordenWholesale, enlaceWholesale } = cargar("lib/wholesale.ts");
+  const html = renderToStaticMarkup(
+    React.createElement(FilaPedidoWholesale, {
+      pedido: {
+        ...pedido,
+        creado_en: "2020-10-24T15:00:00Z",
+        actividad_en: "2020-11-02T22:06:00Z",
+        actividad_tipo: "Cobro aplicado",
+      },
+      params: { orden: "creacion" },
+      seleccionado: false,
+    }),
+  );
+  assert.ok(html.includes("Cobro aplicado"));
+  assert.ok(html.includes('data-tono="violeta"'));
+  assert.ok(html.includes("02/11 18:06"));
+  assert.ok(html.includes("creado 24/10"));
+  assert.ok(html.includes("orden=creacion"));
+  const sin = renderToStaticMarkup(
+    React.createElement(FilaPedidoWholesale, {
+      pedido: { ...pedido, actividad_en: null },
+      params: {},
+      seleccionado: false,
+    }),
+  );
+  assert.ok(sin.includes("—"));
+  assert.equal(tonoActividad("Pedido anulado"), "rojo");
+  assert.equal(tonoActividad("Salida registrada"), "verde");
+  assert.equal(tonoActividad("Alistado en proceso"), "azul");
+  assert.equal(tonoActividad("Pedido editado"), "ambar");
+  assert.equal(tonoActividad("otra cosa"), "gris");
+  assert.equal(ordenWholesale("creacion"), "creacion");
+  assert.equal(ordenWholesale("x"), "actividad");
+  assert.equal(ordenWholesale(undefined), "actividad");
+  assert.ok(enlaceWholesale({ orden: "creacion" }, {}).includes("orden=creacion"));
+});
+
 test("cada etapa mantiene su enlace, texto e icono decorativo; conserva filtros y selección", () => {
   const { FilaPedidoWholesale } = cargar("components/FilaPedidoWholesale.tsx");
   const html = renderToStaticMarkup(
