@@ -59,7 +59,12 @@ export type PedidoWholesale = {
   en_revision: number;
   total_partidas: number;
   ultima_actividad: string;
+  actividad_en?: string | null;
+  actividad_tipo?: string | null;
 };
+export type OrdenWholesale = "actividad" | "creacion";
+export const ordenWholesale = (v: unknown): OrdenWholesale =>
+  v === "creacion" ? "creacion" : "actividad";
 export type LineaWholesale = {
   id: string;
   producto_id: string | null;
@@ -291,7 +296,7 @@ export function enlaceWholesale(
   extras: Record<string, string> = {},
 ): string {
   const q = consultaComun(params);
-  for (const k of ["buscar", "pagina"])
+  for (const k of ["buscar", "pagina", "orden"])
     if (typeof params[k] === "string") q.set(k, params[k] as string);
   for (const [k, v] of Object.entries(extras)) {
     if (v) q.set(k, v);

@@ -1,7 +1,11 @@
 import "server-only";
 import { rpc } from "./operativo";
 import type { Filtros } from "./filtros";
-import type { ExpedienteWholesale, PedidoWholesale } from "./wholesale";
+import type {
+  ExpedienteWholesale,
+  OrdenWholesale,
+  PedidoWholesale,
+} from "./wholesale";
 import type { VideoLocal } from "./videos-locales";
 
 export const obtenerPedidosWholesale = (
@@ -10,11 +14,12 @@ export const obtenerPedidosWholesale = (
   filtros: Filtros,
   buscar: string,
   pagina: number,
+  orden: OrdenWholesale = "actividad",
 ) =>
   rpc<{ total: number; filas: PedidoWholesale[] }>("dash_wholesale_lista", {
     p_desde: desde,
     p_hasta: hasta,
-    p_filtros: filtros,
+    p_filtros: orden === "creacion" ? { ...filtros, orden } : filtros,
     p_buscar: buscar,
     p_pagina: pagina,
   });

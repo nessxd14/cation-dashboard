@@ -21,6 +21,7 @@ export function Periodos({
       "mes",
       "retail_tipo",
       "retail_estado",
+      "orden",
     ].flatMap((k) =>
       typeof params[k] === "string" ? [[k, params[k] as string]] : [],
     ),
