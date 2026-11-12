@@ -65,6 +65,97 @@ export type PedidoWholesale = {
 export type OrdenWholesale = "actividad" | "creacion";
 export const ordenWholesale = (v: unknown): OrdenWholesale =>
   v === "creacion" ? "creacion" : "actividad";
+
+/**
+ * Filtros rápidos de Pedidos. Clave = parámetro de la URL; `rpc` = clave en p_filtros.
+ * Los valores deben coincidir con los que acepta analitica.wholesale_lista.
+ */
+export const FILTROS_RAPIDOS_WHOLESALE = {
+  ws_estado: {
+    rpc: "estado",
+    etiqueta: "Estado",
+    todos: "Todos",
+    opciones: {
+      abierto: "Abiertos (todo lo pendiente)",
+      por_alistar: "· Por alistar",
+      alistando: "· En alistado",
+      listo: "· Listo para salir",
+      en_salida: "· En salida",
+      completado: "Completados",
+      cancelado: "Cancelados",
+    },
+  },
+  ws_cobro: {
+    rpc: "cobro",
+    etiqueta: "Cobro",
+    todos: "Todos",
+    opciones: {
+      con_saldo: "Con saldo (pendiente o abono)",
+      pendiente: "· Pendiente",
+      parcial: "· Abono parcial",
+      por_verificar: "Por verificar",
+      saldo_cero: "Saldo cero",
+      sin_partida: "Sin partida",
+      revisar: "Revisar cobro",
+    },
+  },
+  ws_actividad: {
+    rpc: "actividad",
+    etiqueta: "Última actividad",
+    todos: "Cualquiera",
+    opciones: {
+      problemas: "Con problemas",
+      cobro: "Cobro o anticipo",
+      salida: "Salida o despacho",
+      cambios: "Cambios en el pedido",
+      almacen: "Almacén",
+    },
+  },
+  ws_sin_mov: {
+    rpc: "sin_mov",
+    etiqueta: "Sin movimiento",
+    todos: "—",
+    opciones: {
+      "3": "Hace más de 3 días",
+      "7": "Hace más de 7 días",
+      "15": "Hace más de 15 días",
+      "30": "Hace más de 30 días",
+    },
+  },
+} as const;
+export type ClaveFiltroRapido = keyof typeof FILTROS_RAPIDOS_WHOLESALE;
+export const CLAVES_FILTRO_RAPIDO = Object.keys(
+  FILTROS_RAPIDOS_WHOLESALE,
+) as ClaveFiltroRapido[];
+export type FiltrosRapidosWholesale = Partial<Record<ClaveFiltroRapido, string>>;
+
+/** Solo valores conocidos; cualquier otro se descarta. */
+export function filtrosRapidosWholesale(
+  params: Parametros,
+): FiltrosRapidosWholesale {
+  const r: FiltrosRapidosWholesale = {};
+  for (const k of CLAVES_FILTRO_RAPIDO) {
+    const v = params[k];
+    if (
+      typeof v === "string" &&
+      Object.hasOwn(FILTROS_RAPIDOS_WHOLESALE[k].opciones, v)
+    )
+      r[k] = v;
+  }
+  return r;
+}
+
+/** Traduce los filtros de la URL a las claves de p_filtros. */
+export function filtrosRapidosRpc(
+  f: FiltrosRapidosWholesale,
+): Record<string, string> {
+  return Object.fromEntries(
+    Object.entries(f).map(([k, v]) => [
+      FILTROS_RAPIDOS_WHOLESALE[k as ClaveFiltroRapido].rpc,
+      v as string,
+    ]),
+  );
+}
 export type LineaWholesale = {
   id: string;
   producto_id: string | null;
@@ -296,7 +387,7 @@ export function enlaceWholesale(
   extras: Record<string, string> = {},
 ): string {
   const q = consultaComun(params);
-  for (const k of ["buscar", "pagina", "orden"])
+  for (const k of ["buscar", "pagina", "orden", ...CLAVES_FILTRO_RAPIDO])
     if (typeof params[k] === "string") q.set(k, params[k] as string);
   for (const [k, v] of Object.entries(extras)) {
     if (v) q.set(k, v);

@@ -159,3 +159,74 @@ test("cada etapa mantiene su enlace, texto e icono decorativo; conserva filtros 
   assert.equal((html.match(/<svg/g) || []).length, 6);
   assert.ok(html.includes("1 de 3 líneas completas"));
 });
+
+test("filtros rápidos: solo valores conocidos, claves de p_filtros y enlaces que los conservan", () => {
+  const {
+    filtrosRapidosWholesale,
+    filtrosRapidosRpc,
+    enlaceWholesale,
+  } = cargar("lib/wholesale.ts");
+  const f = filtrosRapidosWholesale({
+    ws_estado: "abierto",
+    ws_cobro: "x",
+    ws_actividad: "problemas",
+    ws_sin_mov: "5",
+  });
+  assert.deepEqual(f, { ws_estado: "abierto", ws_actividad: "problemas" });
+  assert.deepEqual(filtrosRapidosWholesale({ ws_sin_mov: "7" }), {
+    ws_sin_mov: "7",
+  });
+  assert.deepEqual(filtrosRapidosRpc({ ws_cobro: "con_saldo", ws_sin_mov: "7" }), {
+    cobro: "con_saldo",
+    sin_mov: "7",
+  });
+  const url = enlaceWholesale({ ws_estado: "abierto", ws_cobro: "parcial", pagina: "2" }, { pagina: "" });
+  assert.ok(url.includes("ws_estado=abierto"));
+  assert.ok(url.includes("ws_cobro=parcial"));
+  assert.ok(!url.includes("pagina="));
+});
+
+test("tonos de actividad coinciden con analitica.actividad_familia", () => {
+  const { tonoActividad } = cargar("components/FilaPedidoWholesale.tsx");
+  // Etiquetas reales de analitica.pedido_actividad_eventos y su familia en SQL
+  const familia = {
+    problemas: "rojo",
+    cobro: "violeta",
+    salida: "verde",
+    cambios: "ambar",
+    almacen: "azul",
+    otros: "gris",
+  };
+  const sql = {
+    "Alistado": "almacen",
+    "Alistado en curso": "almacen",
+    "Alistado iniciado": "almacen",
+    "Verificado": "almacen",
+    "Verificación en curso": "almacen",
+    "Pedido creado": "otros",
+    "Reemplazo de material": "otros",
+    "Preparación reabierta": "otros",
+    "Cobro aplicado": "cobro",
+    "Anticipo en caja": "cobro",
+    "Pedido anulado": "problemas",
+    "Pedido rechazado": "problemas",
+    "Ítem rechazado": "problemas",
+    "Compra cancelada": "problemas",
+    "Incidencia de almacén": "problemas",
+    "Pedido editado": "cambios",
+    "Pedido restaurado": "cambios",
+    "Ítem cambiado": "cambios",
+    "Ítem retirado": "cambios",
+    "Ítems agregados": "cambios",
+    "Ítem devuelto a almacén": "cambios",
+    "Compra alistada": "cambios",
+    "Compra realizada": "cambios",
+    "Compra recibida": "cambios",
+    "Enviado a compra": "cambios",
+    "Retiro confirmado": "salida",
+    "Despacho registrado": "salida",
+    "Salida de mercadería": "salida",
+  };
+  for (const [tipo, fam] of Object.entries(sql))
+    assert.equal(tonoActividad(tipo), familia[fam], tipo);
+});

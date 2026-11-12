@@ -22,6 +22,10 @@ export function Periodos({
       "retail_tipo",
       "retail_estado",
       "orden",
+      "ws_estado",
+      "ws_cobro",
+      "ws_actividad",
+      "ws_sin_mov",
     ].flatMap((k) =>
       typeof params[k] === "string" ? [[k, params[k] as string]] : [],
     ),
