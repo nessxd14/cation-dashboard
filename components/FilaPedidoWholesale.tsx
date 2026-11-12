@@ -45,7 +45,8 @@ export function tonoActividad(tipo: string | null | undefined): string {
   if (/cobro|anticipo/.test(t)) return "violeta";
   if (/salida|retiro|despacho/.test(t)) return "verde";
   if (/edit|item|compra|restaurad/.test(t)) return "ambar";
-  if (/alistad|verificaci|almacen/.test(t)) return "azul";
+  // Mantener en sincronía con analitica.actividad_familia (filtro "Última actividad")
+  if (/alistad|verifica|almacen/.test(t)) return "azul";
   return "gris";
 }
 

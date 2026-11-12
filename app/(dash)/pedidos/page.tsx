@@ -17,6 +17,9 @@ import {
   idWholesale,
   enlaceWholesale,
   ordenWholesale,
+  filtrosRapidosWholesale,
+  FILTROS_RAPIDOS_WHOLESALE,
+  CLAVES_FILTRO_RAPIDO,
   type Etapa,
 } from "@/lib/wholesale";
 import { enlaceOrigen } from "@/lib/enlaces";
@@ -36,6 +39,8 @@ export default async function PedidosPage({
     typeof params.buscar === "string" ? params.buscar.trim().slice(0, 120) : "";
   const filtros = leerFiltros(params);
   const orden = ordenWholesale(params.orden);
+  const rapidos = filtrosRapidosWholesale(params);
+  const rapidosActivos = Object.keys(rapidos).length;
   if (params.pedido !== undefined && !idWholesale(params.pedido)) notFound();
   const pedido = idWholesale(params.pedido);
   const antes = idWholesale(params.antes);
@@ -47,6 +52,7 @@ export default async function PedidosPage({
       buscar,
       pagina,
       orden,
+      rapidos,
     ),
     pedido ? obtenerExpedienteWholesale(pedido, antes) : null,
     usuarioActual(),
@@ -107,6 +113,66 @@ export default async function PedidosPage({
                 Fecha de creación
               </a>
             </div>
+            <form
+              className="ws-filtros"
+              action="/pedidos"
+              method="get"
+              aria-label="Filtros rápidos de pedidos"
+            >
+              {Array.from(comun.entries()).map(([k, v]) => (
+                <input key={k} type="hidden" name={k} value={v} />
+              ))}
+              {orden === "creacion" ? (
+                <input type="hidden" name="orden" value="creacion" />
+              ) : null}
+              {buscar ? (
+                <input type="hidden" name="buscar" value={buscar} />
+              ) : null}
+              {CLAVES_FILTRO_RAPIDO.map((k) => {
+                const f = FILTROS_RAPIDOS_WHOLESALE[k];
+                return (
+                  <label key={k}>
+                    {f.etiqueta}
+                    <select
+                      name={k}
+                      defaultValue={rapidos[k] ?? ""}
+                      data-activo={rapidos[k] ? "true" : undefined}
+                    >
+                      <option value="">{f.todos}</option>
+                      {Object.entries(f.opciones).map(([v, texto]) => (
+                        <option key={v} value={v}>
+                          {texto}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                );
+              })}
+              <div className="ws-filtros-acciones">
+                <button className="boton-vidrio" type="submit">
+                  Aplicar
+                </button>
+                {rapidosActivos ? (
+                  <Link
+                    href={enlaceWholesale(params, {
+                      ...Object.fromEntries(
+                        CLAVES_FILTRO_RAPIDO.map((k) => [k, ""]),
+                      ),
+                      pagina: "",
+                    })}
+                  >
+                    Quitar filtros ({rapidosActivos})
+                  </Link>
+                ) : null}
+              </div>
+            </form>
+            {rapidos.ws_sin_mov ? (
+              <p className="ws-aviso">
+                «Sin movimiento» ignora el período: muestra los pedidos abiertos
+                o con cobro pendiente cuya última actividad tiene más de{" "}
+                {rapidos.ws_sin_mov} días, sin importar cuándo se crearon.
+              </p>
+            ) : null}
             <form className="ws-buscar" action="/pedidos" method="get">
               {Array.from(comun.entries()).map(([k, v]) => (
                 <input key={k} type="hidden" name={k} value={v} />
@@ -114,6 +180,9 @@ export default async function PedidosPage({
               {orden === "creacion" ? (
                 <input type="hidden" name="orden" value="creacion" />
               ) : null}
+              {Object.entries(rapidos).map(([k, v]) => (
+                <input key={k} type="hidden" name={k} value={v} />
+              ))}
               <label>
                 Pedido o cliente
                 <input
@@ -172,7 +241,9 @@ export default async function PedidosPage({
                   {!lista.filas.length ? (
                     <tr>
                       <td colSpan={8}>
-                        No hay pedidos WholeSale con estos filtros.
+                        {rapidosActivos
+                          ? "No hay pedidos WholeSale con estos filtros. Prueba quitando alguno."
+                          : "No hay pedidos WholeSale con estos filtros."}
                       </td>
                     </tr>
                   ) : null}
